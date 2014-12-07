@@ -31,15 +31,25 @@ from fsnav.cmdl import options
 @options.license
 @click.pass_context
 def main(ctx, configfile, no_load_default):
+
+    # Store variables needed elsewhere
     ctx.obj = {
         'no_load_default': no_load_default,
         'cfg_path': configfile
     }
+
+    # Cache the configfile content
     if os.access(configfile, os.R_OK):
         with open(configfile) as f:
             ctx.obj['cfg_content'] = json.load(f)
     else:
         ctx.obj['cfg_content'] = {}
+
+    # Load the default and configfile aliases according to the above settings
+    if no_load_default:
+        ctx.obj['loaded_aliases'] = ctx.obj['cfg_content']
+    else:
+        ctx.obj['loaded_aliases'] = dict(fsnav.settings.DEFAULT_ALIASES.items() + ctx.obj['cfg_content'].items())
 
 
 # --------------------------------------------------------------------------- #
@@ -58,7 +68,8 @@ def get(ctx, alias):
     """
 
     try:
-        aliases = fsnav.Aliases(**dict(fsnav.settings.DEFAULT_ALIASES.items() + ctx.obj['cfg_content'].items()))
+
+        aliases = fsnav.Aliases(**ctx.obj['loaded_aliases'])
         click.echo(aliases[alias])
     except KeyError:
         click.echo("ERROR: Invalid alias: %s" % alias)
