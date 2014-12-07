@@ -39,5 +39,11 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
     include_package_data=True,
-    keywords='commandline shortcut alias navigation'
+    zip_safe=False,
+    keywords='commandline shortcut alias navigation',
+    entry_points="""
+        [console_scripts]
+        count=fsnav.cmdl.count:main
+        nav=fsnav.cmdl.nav:cli
+    """
 )

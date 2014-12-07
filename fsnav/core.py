@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 
 from glob import glob
 import os
-import pprint
 import re
 
 from . import settings
@@ -18,14 +17,12 @@ __all__ = ['Aliases', 'count', 'validate_alias', 'validate_path']
 
 class Aliases(dict):
 
-    """
-    Reference specific directories on the filesystem via user-defined aliases
-    stored in a dictionary-like object.
-    """
-
     def __init__(self, *args, **kwargs):
 
         """
+        Reference specific directories on the filesystem via user-defined aliases
+        stored in a dictionary-like object.
+
         Functionally, aliases need to be retrieved from a lookup table but must
         be validated when they are added to the table.  Instead of writing
         functions to interact with a "hidden" dictionary, ``dict`` is sub-classed
