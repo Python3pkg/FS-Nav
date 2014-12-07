@@ -19,6 +19,10 @@ class TestAliases(unittest.TestCase):
 
     def test_instantiate(self):
 
+        """
+        Instantiate normally and check a few properties and methods
+        """
+
         aliases = core.Aliases()
         self.assertIsInstance(aliases, (dict, core.Aliases))
         self.assertEqual(0, len(aliases))
@@ -27,6 +31,10 @@ class TestAliases(unittest.TestCase):
         self.assertEqual(2, len(aliases))
 
     def test_setitem(self):
+
+        """
+        Override dict.__setitem__()
+        """
 
         aliases = core.Aliases()
 
@@ -37,24 +45,32 @@ class TestAliases(unittest.TestCase):
         # Invalid alias - no way to test __setitem__() syntax so try/except is a workaround
         try:
             aliases['invalid alias'] = '~'
-            self.assertTrue(False, 'Above line should have raised a KeyError - forcing failure')
+            self.fail('Above line should have raised a KeyError - forcing failure')
         except KeyError:
             self.assertTrue(True)
 
         # Invalid path
         try:
             aliases['invalid_path'] = '.----III_DO_NOT-EX-X-IST'
-            self.assertTrue(False, 'Above line should have raised a ValueError - forcing failure')
+            self.fail('Above line should have raised a ValueError - forcing failure')
         except ValueError:
             self.assertTrue(True)
 
     def test_getitem(self):
+
+        """
+        Override dict.__getitem__()
+        """
 
         aliases = core.Aliases()
         aliases['home'] = '~'
         self.assertEqual(aliases['home'], self.homedir)
 
     def test_as_dict(self):
+
+        """
+        Return aliases as an actual dictionary
+        """
         
         expected = {
             'home': self.homedir,
@@ -64,6 +80,10 @@ class TestAliases(unittest.TestCase):
         self.assertEqual(expected, aliases.as_dict())
         
     def test_setdefault(self):
+
+        """
+        Override dict.setdefault() to force call to Aliases.__setitem__()
+        """
         
         aliases = core.Aliases()
         alias = 'home'
@@ -84,6 +104,10 @@ class TestAliases(unittest.TestCase):
 
     def test_update(self):
 
+        """
+        Override dict.update() to force call to Aliases.__setitem__()
+        """
+
         aliases = core.Aliases()
         aliases['home'] = self.homedir
         aliases.update(home=self.deskdir)
@@ -96,6 +120,10 @@ class TestAliases(unittest.TestCase):
 
     def test_copy(self):
 
+        """
+        Return a copy instance of Aliases in its current state
+        """
+
         aliases1 = core.Aliases(home=self.homedir, desk=self.deskdir)
         aliases2 = aliases1.copy()
         self.assertDictEqual(aliases1, aliases2)
@@ -106,6 +134,10 @@ class TestAliases(unittest.TestCase):
             self.assertEqual(aliases2[a], p)
 
     def test_contextmanager(self):
+
+        """
+        Test syntax: with Aliases({}) as aliases: ...
+        """
 
         with core.Aliases(home=self.homedir, desk=self.deskdir) as aliases:
             self.assertIsInstance(aliases, (dict, core.Aliases))
