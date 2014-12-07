@@ -44,6 +44,6 @@ setup(
     entry_points="""
         [console_scripts]
         count=fsnav.cmdl.count:main
-        nav=fsnav.cmdl.nav:cli
+        nav=fsnav.cmdl.nav:main
     """
 )
