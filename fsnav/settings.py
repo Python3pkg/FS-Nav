@@ -3,8 +3,6 @@ Settings and data
 """
 
 
-from __future__ import unicode_literals
-
 import getpass
 import os
 from os.path import expanduser, join
@@ -60,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # =========================================================================== #
 
 ALIAS_REGEX = "^[\w-]+$"
+NAV_UTIL = 'nav'
 
 
 # =========================================================================== #
@@ -73,7 +72,7 @@ elif 'cygwin' in sys.platform.lower().strip():
 elif 'linux' in sys.platform.lower().strip():
     NORMALIZED_PLATFORM = 'linux'
 elif 'win' in sys.platform.lower().strip():
-    NORMALIZED_PLATFORM = 'win'
+    NORMALIZED_PLATFORM = 'windows'
 else:
     NORMALIZED_PLATFORM = 'UNKNOWN'
 

@@ -27,7 +27,7 @@ setup(
     long_description=readme,
     url=fsnav.__source__,
     license=fsnav.__license__,
-    packages=['fsnav'],
+    packages=['fsnav', 'fsnav.cmdl'],
     classifiers=[
         'Topic :: Utilities',
         'Intended Audience :: Developers',

@@ -47,9 +47,11 @@ def main(ctx, configfile, no_load_default):
 
     # Load the default and configfile aliases according to the above settings
     if no_load_default:
-        ctx.obj['loaded_aliases'] = ctx.obj['cfg_content']
+        ctx.obj['loaded_aliases'] = fsnav.Aliases(ctx.obj['cfg_content'])
     else:
-        ctx.obj['loaded_aliases'] = dict(fsnav.settings.DEFAULT_ALIASES.items() + ctx.obj['cfg_content'].items())
+        ctx.obj['loaded_aliases'] = fsnav.Aliases(
+            fsnav.settings.DEFAULT_ALIASES.items() + ctx.obj['cfg_content'].items()
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -68,13 +70,62 @@ def get(ctx, alias):
     """
 
     try:
-
-        aliases = fsnav.Aliases(**ctx.obj['loaded_aliases'])
-        click.echo(aliases[alias])
+        click.echo(ctx.obj['loaded_aliases'][alias])
     except KeyError:
         click.echo("ERROR: Invalid alias: %s" % alias)
         sys.exit(1)
 
+    sys.exit(0)
+
+
+# =========================================================================== #
+#   Command group: startup
+# =========================================================================== #
+
+@main.group()
+@click.pass_context
+def startup(ctx):
+
+    """
+    Code needed to enable shortcuts on startup
+    """
+
+    pass
+
+
+# --------------------------------------------------------------------------- #
+#   Command: generate
+# --------------------------------------------------------------------------- #
+
+@startup.command()
+@click.pass_context
+def generate(ctx):
+
+    """
+    Shell function shortcuts
+    """
+
+    try:
+        click.echo(' ; '.join(fsnav.fg_tools.generate_functions(ctx.obj['loaded_aliases'])))
+    except Exception as e:
+        click.echo(e, err=True)
+
+    sys.exit(0)
+
+
+# --------------------------------------------------------------------------- #
+#   Command: profile
+# --------------------------------------------------------------------------- #
+
+@startup.command()
+@click.pass_context
+def profile(ctx):
+
+    """
+    Code to activate shortcuts on startup
+    """
+
+    click.echo(fsnav.fg_tools.startup_code)
     sys.exit(0)
 
 
@@ -144,7 +195,7 @@ def nondefault(ctx, no_pretty):
             elif path != fsnav.settings.DEFAULT_ALIASES[alias]:
                 nd_aliases[alias] = path
     except KeyError as e:
-        sys.stderr.write(str(e))
+        click.echo(e, err=True)
         sys.exit(1)
 
     # Remove unicode 'u' in printout to allow serialization
@@ -159,7 +210,7 @@ def nondefault(ctx, no_pretty):
     sys.exit(0)
 
 # --------------------------------------------------------------------------- #
-#   Command: config
+#   Command: set
 # --------------------------------------------------------------------------- #
 
 @config.command()
