@@ -59,7 +59,7 @@ class Aliases(dict):
 
     def __repr__(self):
 
-        return "%s(%s)" % (self.__class__.__name__, {a: p for a, p in self.items()})
+        return "%s(%s)" % (self.__class__.__name__, dict((a, p) for a, p in self.items()))
 
     __str__ = __repr__
 

@@ -254,7 +254,7 @@ class TestCount(unittest.TestCase):
         self.homedir_contents = glob(os.path.join(self.homedir, '*'))
 
         # Make sure there's something to test with
-        self.assertGreater(self.homedir_contents, 0)
+        self.assertGreater(len(self.homedir_contents), 0)
 
     def test_standard(self):
 
