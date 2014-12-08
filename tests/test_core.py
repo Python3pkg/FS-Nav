@@ -16,6 +16,8 @@ class TestAliases(unittest.TestCase):
     def setUp(self):
         self.homedir = os.path.expanduser('~')
         self.deskdir = os.path.join(os.path.expanduser('~'), 'Desktop')
+        if not os.path.isdir(self.deskdir):
+            os.mkdir(self.deskdir)
 
     def test_instantiate(self):
 
@@ -130,7 +132,7 @@ class TestAliases(unittest.TestCase):
         self.assertDictEqual(aliases1.as_dict(), aliases2.as_dict())
         self.assertIsInstance(aliases1, (dict, core.Aliases))
         self.assertIsInstance(aliases2, (dict, core.Aliases))
-        for a, p in aliases1.iteritems():
+        for a, p in aliases1.items():
             self.assertEqual(aliases2[a], p)
 
     def test_contextmanager(self):

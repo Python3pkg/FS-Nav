@@ -59,7 +59,7 @@ class Aliases(dict):
 
     def __repr__(self):
 
-        return "%s(%s)" % (self.__class__.__name__, {a: p for a, p in self.iteritems()})
+        return "%s(%s)" % (self.__class__.__name__, {a: p for a, p in self.items()})
 
     __str__ = __repr__
 
@@ -163,7 +163,7 @@ class Aliases(dict):
         elif alias_iterable and not hasattr(alias_iterable, 'keys'):
             for (alias, path) in alias_iterable:
                 self[alias] = path
-        for alias, path in alias_path.iteritems():
+        for alias, path in alias_path.items():
             self[alias] = path
 
     def copy(self):

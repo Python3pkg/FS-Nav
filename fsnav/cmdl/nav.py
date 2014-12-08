@@ -160,7 +160,7 @@ def default(ctx, no_pretty):
     """
 
     _d_aliases = fsnav.settings.DEFAULT_ALIASES
-    d_aliases = {str(a): str(p) for a, p in _d_aliases.iteritems() if a not in ctx.obj['cfg_content']}
+    d_aliases = {str(a): str(p) for a, p in _d_aliases.items() if a not in ctx.obj['cfg_content']}
 
     if no_pretty:
         text = d_aliases
@@ -189,7 +189,7 @@ def nondefault(ctx, no_pretty):
 
     try:
         nd_aliases = {}
-        for alias, path in fsnav.Aliases(ctx.obj['cfg_content']).iteritems():
+        for alias, path in fsnav.Aliases(ctx.obj['cfg_content']).items():
             if alias not in fsnav.settings.DEFAULT_ALIASES:
                 nd_aliases[alias] = path
             elif path != fsnav.settings.DEFAULT_ALIASES[alias]:
@@ -199,7 +199,7 @@ def nondefault(ctx, no_pretty):
         sys.exit(1)
 
     # Remove unicode 'u' in printout to allow serialization
-    nd_aliases = {str(k): str(v) for k, v in nd_aliases.iteritems()}
+    nd_aliases = {str(k): str(v) for k, v in nd_aliases.items()}
 
     if no_pretty:
         text = nd_aliases

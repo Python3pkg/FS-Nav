@@ -33,6 +33,6 @@ class TestDefaultAliases(unittest.TestCase):
         ``fsnav.core.validate_alias()`` is broken
         """
 
-        for alias, path in settings.DEFAULT_ALIASES.iteritems():
+        for alias, path in settings.DEFAULT_ALIASES.items():
             self.assertTrue(core.validate_alias(alias))
             self.assertTrue(core.validate_path(path))

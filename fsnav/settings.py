@@ -242,7 +242,7 @@ def _remove_invalid_paths(alias_dict):
     dict
     """
 
-    return {a: p for a, p in alias_dict.iteritems() if os.path.isdir(p) and os.access(p, os.X_OK)}
+    return
 
 if NORMALIZED_PLATFORM == 'mac':
     _DEFAULT_ALIASES = _MAC_ALIASES.copy()
@@ -255,4 +255,9 @@ elif NORMALIZED_PLATFORM == 'win':
 else:
     _DEFAULT_ALIASES = _UNKNOWN_ALIASES.copy()
 
-DEFAULT_ALIASES = _remove_invalid_paths(_DEFAULT_ALIASES)
+# Remove aliases pointing towards non-existent directories
+# Python 2.6 does not support direct dictionary comprehension
+_DEFAULT_ALIASES = dict(
+    (a, p) for a, p in _DEFAULT_ALIASES.copy().items() if os.path.isdir(p) and os.access(p, os.X_OK)
+)
+DEFAULT_ALIASES = _DEFAULT_ALIASES.copy()
