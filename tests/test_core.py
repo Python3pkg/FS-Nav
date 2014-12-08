@@ -276,7 +276,7 @@ class TestCount(unittest.TestCase):
         test_items.append(self.homedir_contents[0])
         test_items.append(self.homedir_contents[1])
         self.assertEqual(len(self.homedir_contents), core.count(test_items))
-        self.assertRaises(TypeError, core.count, [[]])
+        self.assertRaises(TypeError, core.count, [None])
 
     def test_non_existent(self):
 
