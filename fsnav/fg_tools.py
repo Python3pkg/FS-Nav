@@ -63,7 +63,9 @@ def _generate_nix_startup_code():
 
     return """
 # == Enable FS Nav shortcuts on startup == #
-[[ -x $(which %s) ]] && eval $(%s startup generate)
+if [ -x $(which %s) ]; then
+    eval $(%s startup generate)
+fi
 """ % (settings.NAV_UTIL, settings.NAV_UTIL)
 
 
