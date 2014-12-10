@@ -143,6 +143,7 @@ def config(ctx):
 
     pass
 
+
 # --------------------------------------------------------------------------- #
 #   Command: default
 # --------------------------------------------------------------------------- #
@@ -154,7 +155,7 @@ def config(ctx):
 )
 @click.pass_context
 def default(ctx, no_pretty):
-    
+
     """
     Print the default aliases
     """
@@ -182,7 +183,7 @@ def default(ctx, no_pretty):
 )
 @click.pass_context
 def nondefault(ctx, no_pretty):
-    
+
     """
     Print the non-default aliases
     """
@@ -208,6 +209,7 @@ def nondefault(ctx, no_pretty):
 
     click.echo(text)
     sys.exit(0)
+
 
 # --------------------------------------------------------------------------- #
 #   Command: set

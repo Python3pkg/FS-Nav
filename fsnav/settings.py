@@ -222,7 +222,7 @@ _UNKNOWN_ALIASES = {
     'user_applications':    join(_homedir, 'Applications'),
     'user_apps':            join(_homedir, 'Applications'),
     'userapps':             join(_homedir, 'Applications')
-} 
+}
 
 
 # =========================================================================== #
