@@ -12,7 +12,7 @@ from fsnav import settings
 
 
 class TestAliases(unittest.TestCase):
-    
+
     def setUp(self):
         self.homedir = os.path.expanduser('~')
         self.deskdir = os.path.join(os.path.expanduser('~'), 'Desktop')
@@ -64,11 +64,11 @@ class TestAliases(unittest.TestCase):
         # Return aliases as an actual dictionary
         expected = {
             'home': self.homedir,
-            'desktop': os.path.expanduser(os.path.join('~', 'Desktop')) 
+            'desktop': os.path.expanduser(os.path.join('~', 'Desktop'))
         }
         aliases = core.Aliases(**expected)
         self.assertEqual(expected, aliases.as_dict())
-        
+
     def test_setdefault(self):
 
         # Override dict.setdefault() to force call to Aliases.__setitem__()
