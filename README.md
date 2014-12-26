@@ -1,7 +1,7 @@
 FS Nav
 ======
 
-[![Build Status](https://travis-ci.org/geowurster/FS-Nav.svg?branch=master)](https://travis-ci.org/geowurster/FS-Nav) [![Coverage Status](https://coveralls.io/repos/geowurster/FS-Nav/badge.png)](https://coveralls.io/r/geowurster/FS-Nav)
+[![Build Status](https://travis-ci.org/geowurster/FS-Nav.svg?branch=master)](https://travis-ci.org/geowurster/FS-Nav)
 
 File System Navigation shortcuts for the commandline
 
