@@ -3,8 +3,6 @@ FS Nav utility unittests: nav
 """
 
 
-from __future__ import unicode_literals
-
 import json
 import os
 import subprocess
@@ -17,7 +15,7 @@ import fsnav
 class TestNav(unittest.TestCase):
 
     def setUp(self):
-        self.configfile = tempfile.NamedTemporaryFile()
+        self.configfile = tempfile.NamedTemporaryFile(mode='r+')
         self.default_aliases = fsnav.Aliases(fsnav.settings.DEFAULT_ALIASES)
 
     def tearDown(self):
@@ -28,36 +26,38 @@ class TestNav(unittest.TestCase):
         # nav get ${alias}
         a = 'home'
         result = subprocess.check_output('nav -nlc get {}'.format(a), shell=True)
-        self.assertEqual(self.default_aliases[a], result.strip())
+        self.assertEqual(self.default_aliases[a], result.decode().strip())
 
     def test_startup_generate(self):
 
         # nav startup generate
         result = subprocess.check_output('nav -nlc startup generate', shell=True)
-        self.assertEqual(result.strip(), ' ; '.join(fsnav.fg_tools.generate_functions(self.default_aliases)))
+        actual = sorted(result.decode().strip().replace('} ; ', '}__SPLIT__').split('__SPLIT__'))
+        expected = sorted(fsnav.fg_tools.generate_functions(self.default_aliases))
+        self.assertEqual(actual, expected)
 
     def test_startup_profile(self):
 
         # nav startup profile
         result = subprocess.check_output('nav -nlc startup profile', shell=True)
-        self.assertEqual(result.strip(), fsnav.fg_tools.startup_code.strip())
+        self.assertEqual(result.decode().strip(), fsnav.fg_tools.startup_code.strip())
 
     def test_config_default(self):
 
         # nav config default
         result = subprocess.check_output('nav -nlc config default -np', shell=True)
-        self.assertDictEqual(json.loads(result), self.default_aliases.default())
+        self.assertDictEqual(json.loads(result.decode()), self.default_aliases.default())
 
     def test_config_userdefined(self):
 
         # nav config userdefined
         ud = {'__h__': os.path.expanduser('~')}
-        aliases_to_load = dict(ud.items() + fsnav.settings.DEFAULT_ALIASES.items())
+        aliases_to_load = dict(list(ud.items()) + list(fsnav.settings.DEFAULT_ALIASES.items()))
         self.configfile.write(json.dumps({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_to_load}))
         self.configfile.seek(0)
         result = subprocess.check_output(
             'nav -c {configfile} config userdefined -np'.format(configfile=self.configfile.name), shell=True)
-        self.assertDictEqual(ud, json.loads(result.strip()))
+        self.assertDictEqual(ud, json.loads(result.decode().strip()))
 
     def test_config_addalias(self):
 
@@ -87,16 +87,16 @@ class TestNav(unittest.TestCase):
 
         # nav config path
         result = subprocess.check_output('nav config path', shell=True)
-        self.assertEqual(result.strip(), fsnav.settings.CONFIGFILE)
+        self.assertEqual(result.decode().strip(), fsnav.settings.CONFIGFILE)
 
     def test_license(self):
 
         # nav --license
         result = subprocess.check_output('nav --license', shell=True)
-        self.assertEqual(result.strip(), fsnav.__license__.strip())
+        self.assertEqual(result.decode().strip(), fsnav.__license__.strip())
 
     def test_version(self):
 
         # nav --version
         result = subprocess.check_output('nav --version', shell=True)
-        self.assertEqual(result.strip(), fsnav.__version__.strip())
+        self.assertEqual(result.decode().strip(), fsnav.__version__.strip())

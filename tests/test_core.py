@@ -121,7 +121,7 @@ class TestAliases(unittest.TestCase):
 
         # Get all user-defined aliases
         ud = {'__h__': os.path.expanduser('~')}
-        aliases = core.Aliases(ud.items() + settings.DEFAULT_ALIASES.items())
+        aliases = core.Aliases(list(ud.items()) + list(settings.DEFAULT_ALIASES.items()))
         user_defined = aliases.user_defined()
         self.assertEqual(1, len(user_defined))
         self.assertDictEqual(ud, user_defined)
@@ -130,9 +130,9 @@ class TestAliases(unittest.TestCase):
 
         # Get all default aliases
         ud = {'__h__': os.path.expanduser('~')}
-        aliases = core.Aliases(ud.items() + settings.DEFAULT_ALIASES.items())
+        aliases = core.Aliases(list(ud.items()) + list(settings.DEFAULT_ALIASES.items()))
         default = aliases.default()
-        self.assertEqual(len(settings.DEFAULT_ALIASES.items()), len(default))
+        self.assertEqual(len(list(settings.DEFAULT_ALIASES.items())), len(default))
         self.assertDictEqual(default, settings.DEFAULT_ALIASES)
 
 
