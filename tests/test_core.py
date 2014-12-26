@@ -5,10 +5,10 @@ Unittests for core components
 
 from glob import glob
 import os
-import stat
 import unittest
 
 from fsnav import core
+from fsnav import settings
 
 
 class TestAliases(unittest.TestCase):
@@ -21,10 +21,7 @@ class TestAliases(unittest.TestCase):
 
     def test_instantiate(self):
 
-        """
-        Instantiate normally and check a few properties and methods
-        """
-
+        # Instantiate normally and check a few properties and methods
         aliases = core.Aliases()
         self.assertIsInstance(aliases, (dict, core.Aliases))
         self.assertEqual(0, len(aliases))
@@ -34,10 +31,7 @@ class TestAliases(unittest.TestCase):
 
     def test_setitem(self):
 
-        """
-        Override dict.__setitem__()
-        """
-
+        # Override dict.__setitem__()
         aliases = core.Aliases()
 
         # Valid alias
@@ -60,20 +54,14 @@ class TestAliases(unittest.TestCase):
 
     def test_getitem(self):
 
-        """
-        Override dict.__getitem__()
-        """
-
+        # Override dict.__getitem__()
         aliases = core.Aliases()
         aliases['home'] = '~'
         self.assertEqual(aliases['home'], self.homedir)
 
     def test_as_dict(self):
 
-        """
-        Return aliases as an actual dictionary
-        """
-        
+        # Return aliases as an actual dictionary
         expected = {
             'home': self.homedir,
             'desktop': os.path.expanduser(os.path.join('~', 'Desktop')) 
@@ -83,10 +71,7 @@ class TestAliases(unittest.TestCase):
         
     def test_setdefault(self):
 
-        """
-        Override dict.setdefault() to force call to Aliases.__setitem__()
-        """
-        
+        # Override dict.setdefault() to force call to Aliases.__setitem__()
         aliases = core.Aliases()
         alias = 'home'
         path = self.homedir
@@ -106,10 +91,7 @@ class TestAliases(unittest.TestCase):
 
     def test_update(self):
 
-        """
-        Override dict.update() to force call to Aliases.__setitem__()
-        """
-
+        # Override dict.update() to force call to Aliases.__setitem__()
         aliases = core.Aliases()
         aliases['home'] = self.homedir
         aliases.update(home=self.deskdir)
@@ -122,128 +104,36 @@ class TestAliases(unittest.TestCase):
 
     def test_copy(self):
 
-        """
-        Return a copy instance of Aliases in its current state
-        """
-
+        # Return a copy instance of Aliases in its current state
         aliases1 = core.Aliases(home=self.homedir, desk=self.deskdir)
         aliases2 = aliases1.copy()
         self.assertDictEqual(aliases1, aliases2)
-        self.assertDictEqual(aliases1.as_dict(), aliases2.as_dict())
-        self.assertIsInstance(aliases1, (dict, core.Aliases))
         self.assertIsInstance(aliases2, (dict, core.Aliases))
-        for a, p in aliases1.items():
-            self.assertEqual(aliases2[a], p)
 
     def test_contextmanager(self):
 
-        """
-        Test syntax: with Aliases({}) as aliases: ...
-        """
+        # Test syntax: with Aliases({}) as aliases: ...
+        aliases = core.Aliases(home=self.homedir, desk=self.deskdir)
+        self.assertIsInstance(aliases, (dict, core.Aliases))
+        self.assertEqual(2, len(aliases))
 
-        with core.Aliases(home=self.homedir, desk=self.deskdir) as aliases:
-            self.assertIsInstance(aliases, (dict, core.Aliases))
-            self.assertEqual(2, len(aliases))
+    def test_user_defined(self):
 
+        # Get all user-defined aliases
+        ud = {'__h__': os.path.expanduser('~')}
+        aliases = core.Aliases(ud.items() + settings.DEFAULT_ALIASES.items())
+        user_defined = aliases.user_defined()
+        self.assertEqual(1, len(user_defined))
+        self.assertDictEqual(ud, user_defined)
 
-class TestValidateAlias(unittest.TestCase):
+    def test_default(self):
 
-    def test_valid(self):
-
-        """
-        Valid alias name should return True
-        """
-
-        self.assertTrue(core.validate_alias('desk'))
-
-    def test_dash_underscore(self):
-
-        """
-        Dashes and underscores are valid
-        """
-
-        self.assertTrue(core.validate_alias('-'))
-        self.assertTrue(core.validate_alias('_'))
-
-    def test_whitespace(self):
-
-        """
-        No whitespace allowed
-        """
-
-        self.assertFalse(core.validate_alias(' '))
-        self.assertFalse(core.validate_alias('\t'))
-        self.assertFalse(core.validate_alias('\r'))
-
-    def test_punctuation(self):
-
-        """
-        No punctuation allowed
-        """
-
-        self.assertFalse(core.validate_alias('.'))
-        self.assertFalse(core.validate_alias('?'))
-        self.assertFalse(core.validate_alias('/'))
-        self.assertFalse(core.validate_alias('|'))
-
-
-class TestValidatePath(unittest.TestCase):
-
-    def setUp(self):
-
-        self.homedir = os.path.expanduser('~')
-        self.test_file_path = '.TEST-FILE-fffffIIIILLLEEEEE__---_-%s' % self.__class__.__name__
-        if os.path.isfile(self.test_file_path):
-            os.remove(self.test_file_path)
-        elif os.path.isdir(self.test_file_path):
-            os.rmdir(self.test_file_path)
-
-    def tearDown(self):
-        if os.path.isfile(self.test_file_path):
-            os.remove(self.test_file_path)
-        elif os.path.isdir(self.test_file_path):
-            os.rmdir(self.test_file_path)
-
-    def test_valid(self):
-
-        """
-        Valid path and standard usage
-        """
-
-        self.assertTrue(core.validate_path(self.homedir))
-
-    def test_non_existent(self):
-
-        """
-        Non-existent paths should return False
-        """
-
-        self.assertFalse(core.validate_path('.I-DO-NOT___eX-ist-T'))
-
-    def test_no_execute(self):
-
-        """
-        Paths without execute permission should return False.
-        """
-
-        os.mkdir(self.test_file_path)
-        os.chmod(self.test_file_path, stat.S_IREAD | stat.S_IWRITE)
-
-        # Independently verify that the file cannot be executed
-        self.assertFalse(os.access(self.test_file_path, os.X_OK), "Test file has X bit flipped - test will always fail")
-        self.assertFalse(core.validate_path(self.test_file_path))
-
-    def test_exists_but_not_directory(self):
-
-        """
-        Paths that are not a directory are not valid as they cannot be
-        ``cd``'d into.
-        """
-
-        with open(self.test_file_path, 'w') as f:
-            f.write("")
-
-        self.assertFalse(core.validate_path(self.test_file_path))
+        # Get all default aliases
+        ud = {'__h__': os.path.expanduser('~')}
+        aliases = core.Aliases(ud.items() + settings.DEFAULT_ALIASES.items())
+        default = aliases.default()
+        self.assertEqual(len(settings.DEFAULT_ALIASES.items()), len(default))
+        self.assertDictEqual(default, settings.DEFAULT_ALIASES)
 
 
 class TestCount(unittest.TestCase):
@@ -258,20 +148,14 @@ class TestCount(unittest.TestCase):
 
     def test_standard(self):
 
-        """
-        No duplicate items, and no validation.  Just return the number of input
-        items.  Return value should be equal to the length of the input list
-        """
-
+        # No duplicate items, and no validation.  Just return the number of input items.  Return value should be equal
+        # to the length of the input list
         self.assertEqual(len(self.homedir_contents), core.count(self.homedir_contents))
 
     def test_duplicate(self):
 
-        """
-        Count with duplicate items should return a count of all unique items
-        """
-
-        # list() call ensures a new list is returned
+        # Count with duplicate items should return a count of all unique items - list() call ensures a new list is
+        # returned instead of a pointer
         test_items = list(self.homedir_contents)
         test_items.append(self.homedir_contents[0])
         test_items.append(self.homedir_contents[1])
@@ -280,10 +164,7 @@ class TestCount(unittest.TestCase):
 
     def test_non_existent(self):
 
-        """
-        Non-existent items should be ignored and not reflected int he final count
-        """
-
+        # Non-existent items should be ignored and not reflected int he final count
         test_items = list(self.homedir_contents)
         test_items.append('.I-_DO-NOT___--EXIST')
         self.assertEqual(len(self.homedir_contents), core.count(test_items))

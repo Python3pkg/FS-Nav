@@ -3,10 +3,10 @@ Unittests for settings and data
 """
 
 
+import re
 import os
 import unittest
 
-from fsnav import core
 from fsnav import settings
 
 
@@ -19,20 +19,13 @@ class TestDefaultAliases(unittest.TestCase):
 
     def test_existence(self):
 
-        """
-        Make sure all the default aliases actually exist and are accessible
-        """
-
+        # Make sure all the default aliases actually exist and are accessible
         for path in settings.DEFAULT_ALIASES.values():
             self.assertTrue(os.path.exists(path))
 
     def test_validity(self):
 
-        """
-        Failure could mean ``fsnav.core.validate_path()`` and/or
-        ``fsnav.core.validate_alias()`` is broken
-        """
-
+        # Failure could mean ``fsnav.core.validate_path()`` and/or ``fsnav.core.validate_alias()`` is broken
         for alias, path in settings.DEFAULT_ALIASES.items():
-            self.assertTrue(core.validate_alias(alias))
-            self.assertTrue(core.validate_path(path))
+            self.assertIsNotNone(re.match(settings.ALIAS_REGEX, alias), msg="Alias='{}'".format(alias))
+            self.assertTrue(os.path.isdir(path) and os.access(path, os.X_OK), msg="Path='{}'".format(path))

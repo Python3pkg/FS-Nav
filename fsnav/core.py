@@ -3,8 +3,6 @@ Core components for FS Nav
 """
 
 
-from __future__ import unicode_literals
-
 from glob import glob
 import os
 import re
@@ -12,7 +10,7 @@ import re
 from . import settings
 
 
-__all__ = ['Aliases', 'count', 'validate_alias', 'validate_path']
+__all__ = ['Aliases', 'count']
 
 
 class Aliases(dict):
@@ -108,9 +106,9 @@ class Aliases(dict):
         else:
             path = os.path.expanduser(path)
 
-        if not validate_alias(alias):
+        if re.match(settings.ALIAS_REGEX, alias) is None:
             raise KeyError("Aliases can only contain alphanumeric characters and '-' or '_': '%s'" % alias)
-        elif not validate_path(path):
+        elif not os.path.isdir(path) and not os.access(path, os.X_OK):
             raise ValueError("Can't access path: '%s'" % path)
         else:
             # Forces all non-overridden methods that normally call dict.__setitem__ to call Aliases.__setitem__() in
@@ -178,47 +176,33 @@ class Aliases(dict):
 
         return Aliases(**self.as_dict())
 
+    def user_defined(self):
 
-def validate_alias(alias):
+        """
+        Extract user-defined aliases from an `Alises()` instance
 
-    """
-    Make sure the supplied alias is valid.  Test currently only makes sure
-    alias passes the following regex defined in ``fsnav.settings.ALIAS_REGEX``.
+        Parameters
+        ----------
+        aliases : Aliases or dict
+            Loaded aliases or dictionary of aliases to check
+        default : Aliases or dict or list or tuple, optional
+            Default aliases defined by `fsnav` on import
 
-    In general, no whitespace or punctuation.
+        Returns
+        -------
+        Aliases
+            All user-defined aliases
+        """
 
-    Parameters
-    ----------
-    alias : str or unicode
-        Desired alias name
+        return Aliases({a: p for a, p in self.items() if a not in settings.DEFAULT_ALIASES})
 
-    Returns
-    -------
-    bool
-    """
+    def default(self):
 
-    return re.match(settings.ALIAS_REGEX, alias) is not None
+        """
+        Extract non-user-defined aliases form an `Aliases()` instance
+        """
 
-
-def validate_path(path):
-
-    """
-    Make sure the supplied path exists and the ``x`` bit is set so the
-    directory can be accessed.
-
-    In general, the path must be an existing directory with execute access
-
-    Parameters
-    ----------
-    path : str or unicode
-        Path to be assigned to an alias
-
-    Returns
-    -------
-    bool
-    """
-
-    return os.path.isdir(path) and os.access(path, os.X_OK)
+        return Aliases({a: p for a, p in self.items() if a in settings.DEFAULT_ALIASES})
 
 
 def count(items_to_count):
@@ -226,9 +210,6 @@ def count(items_to_count):
     """
     Count files and directories on the commandline.  Performs validation
     and shell expansion so you don't have to.
-
-    Note that ``core.validate_path()`` is not used because execute access is
-    not required.
 
     Parameters
     ----------

@@ -82,7 +82,7 @@ else:
 # =========================================================================== #
 
 CONFIGFILE = join(expanduser('~'), '.fsnav')
-CONFIGFILE_ALIAS_SECTION = 'Aliases'
+CONFIGFILE_ALIAS_SECTION = 'aliases'
 
 
 # =========================================================================== #

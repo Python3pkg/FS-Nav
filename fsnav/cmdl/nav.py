@@ -27,31 +27,41 @@ from fsnav.cmdl import options
     '-nld', '--no-load-default', is_flag=True,
     help="Don't load default aliases"
 )
+@click.option(
+    '-nlc', '--no-load-configfile', is_flag=True,
+    help="Don't load the configfile"
+)
 @options.version
 @options.license
 @click.pass_context
-def main(ctx, configfile, no_load_default):
+def main(ctx, configfile, no_load_default, no_load_configfile):
 
     # Store variables needed elsewhere
     ctx.obj = {
         'no_load_default': no_load_default,
-        'cfg_path': configfile
+        'no_load_configfile': no_load_configfile,
+        'cfg_path': configfile,
+        'loaded_aliases': fsnav.Aliases({}),
+        'cfg_content': None
     }
 
-    # Cache the configfile content
-    if os.access(configfile, os.R_OK):
-        with open(configfile) as f:
-            ctx.obj['cfg_content'] = json.load(f)
-    else:
-        ctx.obj['cfg_content'] = {}
+    # MAY NEED TO ADD A MORE VERBOSE WARNING HERE
+    # Cache all the configfile content
+    # Try-except handles configfiles that are completely empty
+    try:
+        if os.access(configfile, os.R_OK):
+            with open(configfile) as f:
+                ctx.obj['cfg_content'] = json.load(f)
+    except ValueError:
+        pass
 
     # Load the default and configfile aliases according to the above settings
-    if no_load_default:
-        ctx.obj['loaded_aliases'] = fsnav.Aliases(ctx.obj['cfg_content'])
-    else:
-        ctx.obj['loaded_aliases'] = fsnav.Aliases(
-            fsnav.settings.DEFAULT_ALIASES.items() + ctx.obj['cfg_content'].items()
-        )
+    if not no_load_default:
+        for a, p in fsnav.settings.DEFAULT_ALIASES.items():
+            ctx.obj['loaded_aliases'][a] = p
+    if ctx.obj['cfg_content'] is not None and not no_load_configfile and os.access(configfile, os.R_OK):
+        for a, p in ctx.obj['cfg_content'][fsnav.settings.CONFIGFILE_ALIAS_SECTION].items():
+            ctx.obj['loaded_aliases'][a] = p
 
 
 # --------------------------------------------------------------------------- #
@@ -71,11 +81,10 @@ def get(ctx, alias):
 
     try:
         click.echo(ctx.obj['loaded_aliases'][alias])
+        sys.exit(0)
     except KeyError:
         click.echo("ERROR: Invalid alias: %s" % alias)
         sys.exit(1)
-
-    sys.exit(0)
 
 
 # =========================================================================== #
@@ -107,10 +116,10 @@ def generate(ctx):
 
     try:
         click.echo(' ; '.join(fsnav.fg_tools.generate_functions(ctx.obj['loaded_aliases'])))
+        sys.exit(0)
     except Exception as e:
         click.echo(e, err=True)
-
-    sys.exit(0)
+        sys.exit(1)
 
 
 # --------------------------------------------------------------------------- #
@@ -125,8 +134,12 @@ def profile(ctx):
     Code to activate shortcuts on startup
     """
 
-    click.echo(fsnav.fg_tools.startup_code)
-    sys.exit(0)
+    try:
+        click.echo(fsnav.fg_tools.startup_code)
+        sys.exit(0)
+    except Exception as e:
+        click.echo(e, err=True)
+        sys.exit(1)
 
 
 # =========================================================================== #
@@ -149,10 +162,7 @@ def config(ctx):
 # --------------------------------------------------------------------------- #
 
 @config.command()
-@click.option(
-    '-np', '--no-pretty', is_flag=True,
-    help="Don't format output"
-)
+@options.no_pretty
 @click.pass_context
 def default(ctx, no_pretty):
 
@@ -160,16 +170,17 @@ def default(ctx, no_pretty):
     Print the default aliases
     """
 
-    _d_aliases = fsnav.settings.DEFAULT_ALIASES
-    d_aliases = dict((str(a), str(p)) for a, p in _d_aliases.items() if a not in ctx.obj['cfg_content'])
-
-    if no_pretty:
-        text = d_aliases
-    else:
-        text = pprint.pformat(d_aliases)
-
-    click.echo(text)
-    sys.exit(0)
+    try:
+        default_aliases = {str(a): str(p) for a, p in ctx.obj['loaded_aliases'].default().as_dict().items()}
+        if no_pretty:
+            text = json.dumps(default_aliases)
+        else:
+            text = pprint.pformat(default_aliases)
+        click.echo(text)
+        sys.exit(0)
+    except Exception as e:
+        click.echo(e, err=True)
+        sys.exit(1)
 
 
 # --------------------------------------------------------------------------- #
@@ -177,38 +188,25 @@ def default(ctx, no_pretty):
 # --------------------------------------------------------------------------- #
 
 @config.command()
-@click.option(
-    '-np', '--no-pretty', is_flag=True,
-    help="Don't format output"
-)
+@options.no_pretty
 @click.pass_context
-def nondefault(ctx, no_pretty):
+def userdefined(ctx, no_pretty):
 
     """
-    Print the non-default aliases
+    Print user-defined aliases
     """
 
     try:
-        nd_aliases = {}
-        for alias, path in fsnav.Aliases(ctx.obj['cfg_content']).items():
-            if alias not in fsnav.settings.DEFAULT_ALIASES:
-                nd_aliases[alias] = path
-            elif path != fsnav.settings.DEFAULT_ALIASES[alias]:
-                nd_aliases[alias] = path
-    except KeyError as e:
+        nd_aliases = {str(a): str(p) for a, p in ctx.obj['loaded_aliases'].user_defined().as_dict().items()}
+        if no_pretty:
+            text = json.dumps(nd_aliases)
+        else:
+            text = pprint.pformat(nd_aliases)
+        click.echo(text)
+        sys.exit(0)
+    except Exception as e:
         click.echo(e, err=True)
         sys.exit(1)
-
-    # Remove unicode 'u' in printout to allow serialization
-    nd_aliases = dict((str(k), str(v)) for k, v in nd_aliases.items())
-
-    if no_pretty:
-        text = nd_aliases
-    else:
-        text = pprint.pformat(nd_aliases)
-
-    click.echo(text)
-    sys.exit(0)
 
 
 # --------------------------------------------------------------------------- #
@@ -224,37 +222,26 @@ def nondefault(ctx, no_pretty):
     help="Don't overwrite configfile if it exists"
 )
 @click.pass_context
-def set(ctx, alias_path, no_overwrite):
+def addalias(ctx, alias_path, no_overwrite):
 
     """
-    Add additional aliases to be stored in a configfile
+    Add a user defined alias
     """
 
     if no_overwrite and os.access(ctx.obj['cfg_path'], os.W_OK):
-        click.echo("ERROR: Overwrite=%s and configfile exists: %s" % (no_overwrite, ctx.obj['cfg_path']))
+        click.echo("ERROR: No overwrite is %s and configfile exists: %s" % (no_overwrite, ctx.obj['cfg_path']))
         sys.exit(1)
 
-    # Validate
-    for ap in alias_path:
-        if '=' not in ap:
-            click.echo("ERROR: Invalid syntax for new alias: %s" % ap)
-            sys.exit(1)
-
     try:
-        d_aliases = fsnav.settings.DEFAULT_ALIASES
-        new_aliases = fsnav.Aliases()
-        for ap in alias_path:
-            alias, path = ap.split('=')
-            if alias not in d_aliases or d_aliases[alias] != path:
-                new_aliases[alias] = path
+        aliases = ctx.obj['loaded_aliases'].copy()
+        for a, p in options.parse_key_vals(alias_path).items():
+            aliases[a] = p
+        with open(ctx.obj['cfg_path'], 'w') as f:
+            json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases.user_defined()}, f)
+        sys.exit(0)
     except Exception as e:
         click.echo(e)
         sys.exit(1)
-
-    with open(ctx.obj['cfg_path'], 'w') as f:
-        json.dump(new_aliases.as_dict(), f)
-
-    sys.exit(0)
 
 
 # --------------------------------------------------------------------------- #
@@ -269,5 +256,9 @@ def path(ctx):
     Print the path to the configfile
     """
 
-    click.echo(ctx.obj['cfg_path'])
-    sys.exit(0)
+    try:
+        click.echo(ctx.obj['cfg_path'])
+        sys.exit(0)
+    except Exception as e:
+        click.echo(e, err=True)
+        sys.exit(1)
