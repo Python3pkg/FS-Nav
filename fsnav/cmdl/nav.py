@@ -51,7 +51,7 @@ def main(ctx, configfile, no_load_default, no_load_configfile):
     try:
         if os.access(configfile, os.R_OK):
             with open(configfile) as f:
-                ctx.obj['cfg_content'] = json.loads(f.read().decode('utf-8'))
+                ctx.obj['cfg_content'] = json.loads(f.read())
     except ValueError:
         pass
 
