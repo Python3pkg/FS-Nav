@@ -1,5 +1,5 @@
 """
-FS Nav count utility
+FS Nav utility: count
 """
 
 
@@ -26,6 +26,9 @@ def main(ctx, paths):
     Only paths that exist will be counted
     """
 
-    click.echo(fsnav.count(paths))
-
-    sys.exit(0)
+    try:
+        click.echo(fsnav.count(paths))
+        sys.exit(0)
+    except Exception as e:
+        click.echo(e.message, err=True)
+        sys.exit(1)

@@ -1,5 +1,5 @@
 """
-Core components for FS Nav
+Core functions and classes for FS Nav
 """
 
 
@@ -21,24 +21,30 @@ class Aliases(dict):
         Reference specific directories on the filesystem via user-defined aliases
         stored in a dictionary-like object.
 
-        Functionally, aliases need to be retrieved from a lookup table but must
-        be validated when they are added to the table.  Instead of writing
-        functions to interact with a "hidden" dictionary, ``dict`` is sub-classed
-        and specific methods are overwritten, the most important of which is
-        ``self.__setitem__()``.  See ``self.__setitem__.__doc__`` for information
-        about how aliases are validated.
+        One could just store the aliases and directories in a dictionary but they
+        should be validated when added.  Furthermore directory locations and names
+        are not completely standardized across operating systems.  The default
+        aliases found in `fsnav.DEFAULT_ALIASES` are almost identical when loaded
+        on every platform but point to slightly different directories.
 
-        In general, treat ``Aliases()`` as though it was a dictionary.  In order
-        to add an alias, set a key equal to a directory.  Aliases must not have spaces or punctuation and directories
-        must exist and be executable.
+        In general, treat `Aliases()` as though it was a dictionary.  In order
+        to add an alias, set a key equal to a directory.  Aliases must not
+        have spaces or punctuation and directories must exist and be executable.
+
+        An instance of `Aliases()` can be created the following ways:
+
+            >>> aliases = Aliases()
+            >>> aliases['home'] = '~/'
+            >>> aliases['desk'] = '~/Desktop'
 
             >>> aliases = Aliases(home='~/', desk='~/Desktop')
+
             >>> aliases = Aliases({'home': '~/', 'desk': '~/Desktop'})
+
             >>> aliases = Aliases((('home', '~/'), ('desk', '~/Desktop')))
-            >>> aliases['home']
-            '~/'
-            >>> aliases['desk']
-            '~/Desktop'
+
+            >>> print(aliases)
+            Aliases({'home': '/Users/wursterk/', 'desk': '/Users/wursterk/Desktop'})
 
         Aliases can then be used for navigation, most notably via the included
         commandline utility ``nav``.  See ``nav --help`` for more information
@@ -81,35 +87,38 @@ class Aliases(dict):
 
         """
         Enable ``Aliases[alias] = path`` syntax with the necessary validations.
-        A valid ``alias`` does not contain spaces or punctuation and must match
-        the regex defined in ``fsnav.settings.ALIAS_REGEX``.  A valid ``path``
-        exists and is executable in order to allow changing the working directory
-        to the ``path``.  Note that ``~/`` is valid but ``*`` wildcards are not,
-        even if expansion yields a single directory.
+        A valid `alias` does not contain spaces or punctuation and must match
+        the regex defined in `fsnav.settings.ALIAS_REGEX`.  A valid `path` must
+        exist and be executable.  Note that `~/` is expanded but `*` wildcards
+        are not supported.
 
         Raises
         ------
         ValueError
             Invalid alias
         KeyError
-            Invalid path or path is `None`
+            Invalid path
 
         Returns
         -------
         None
         """
 
-        # No way around this first if/else - have to check for None before expanduser(),
-        # otherwise an AttributeError is raised
+        # ave to check for None before expanduser() otherwise an AttributeError is raised
         if path is None:
             raise ValueError("Path cannot be NoneType")
         else:
             path = os.path.expanduser(path)
 
+        # Validate the alias
         if re.match(settings.ALIAS_REGEX, alias) is None:
             raise KeyError("Aliases can only contain alphanumeric characters and '-' or '_': '%s'" % alias)
+
+        # Validate the path
         elif not os.path.isdir(path) and not os.access(path, os.X_OK):
             raise ValueError("Can't access path: '%s'" % path)
+
+        # Alias and path passed validate - add
         else:
             # Forces all non-overridden methods that normally call dict.__setitem__ to call Aliases.__setitem__() in
             # order to take advantage of the alias and path validation
@@ -118,8 +127,7 @@ class Aliases(dict):
     def as_dict(self):
 
         """
-        Return the dictionary containing aliases and paths without the Aliases()
-        sub-class.
+        Return the dictionary containing aliases and paths as an actual dictionary
 
         Returns
         -------
@@ -135,7 +143,7 @@ class Aliases(dict):
 
         Returns
         -------
-        str or unicode
+        str
             Path assigned to alias
         """
 
@@ -167,7 +175,7 @@ class Aliases(dict):
     def copy(self):
 
         """
-        Creates a copy of Aliases() and all contained aliases and paths
+        Creates a copy of `Aliases()` and all contained aliases and paths
 
         Returns
         -------
@@ -179,14 +187,7 @@ class Aliases(dict):
     def user_defined(self):
 
         """
-        Extract user-defined aliases from an `Alises()` instance
-
-        Parameters
-        ----------
-        aliases : Aliases or dict
-            Loaded aliases or dictionary of aliases to check
-        default : Aliases or dict or list or tuple, optional
-            Default aliases defined by `fsnav` on import
+        Extract user-defined aliases from an `Aliases()` instance
 
         Returns
         -------
@@ -199,7 +200,12 @@ class Aliases(dict):
     def default(self):
 
         """
-        Extract non-user-defined aliases form an `Aliases()` instance
+        Extract aliases defined by FS Nav on import
+
+        Returns
+        -------
+        Aliases
+            Default aliases
         """
 
         return Aliases({a: p for a, p in self.items() if a in settings.DEFAULT_ALIASES})

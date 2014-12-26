@@ -1,5 +1,5 @@
 """
-Unittests for core components
+Unittests for: fsnav.core
 """
 
 

@@ -1,5 +1,6 @@
 """
-FS Nav commandline utility unittests
+Unittests for FS Nav commandline utilities
 """
+
 
 from . import *

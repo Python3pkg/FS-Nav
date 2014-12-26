@@ -1,5 +1,5 @@
 """
-Entry points FS Nav commandline utilities
+FS Nav commandline utilities
 """
 
 

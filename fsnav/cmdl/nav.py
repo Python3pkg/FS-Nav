@@ -1,5 +1,5 @@
 """
-FS Nav commandline interface
+FS Nav utility: nav
 """
 
 
@@ -18,7 +18,7 @@ from fsnav.cmdl import options
 #   Command group: main
 # =========================================================================== #
 
-@click.group(help="FS Nav commandline utility")
+@click.group()
 @click.option(
     '-c', '--configfile', type=click.Path(), default=fsnav.settings.CONFIGFILE,
     help="Specify configfile"
@@ -35,6 +35,10 @@ from fsnav.cmdl import options
 @options.license
 @click.pass_context
 def main(ctx, configfile, no_load_default, no_load_configfile):
+
+    """
+    FS Nav commandline utility
+    """
 
     # Store variables needed elsewhere
     ctx.obj = {

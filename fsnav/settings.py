@@ -9,7 +9,8 @@ from os.path import expanduser, join
 import sys
 
 
-__all__ = ['__version__', '__release__', '__author__', '__email__', '__source__', '__license__']
+__all__ = ['__version__', '__release__', '__author__', '__email__', '__source__', '__license__',
+           'DEFAULT_ALIASES', 'CONFIGFILE', 'CONFIGFILE_ALIAS_SECTION', 'NORMALIZED_PLATFORM']
 
 
 # =========================================================================== #

@@ -1,5 +1,5 @@
 """
-Unittests for settings and data
+Unittests for: fsnav.settings
 """
 
 
