@@ -17,7 +17,7 @@ __all__ = ['__version__', '__release__', '__author__', '__email__', '__source__'
 #   Build information
 # =========================================================================== #
 
-__version__ = '1.0'
+__version__ = '0.9'
 __release__ = '2014-06-28'
 __author__ = 'Kevin Wurster'
 __email__ = 'wursterk@gmail.com'
