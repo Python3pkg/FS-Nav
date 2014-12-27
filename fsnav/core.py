@@ -192,10 +192,11 @@ class Aliases(dict):
         Returns
         -------
         Aliases
-            All user-defined aliases
+            All user-defined aes
         """
 
-        return Aliases({a: p for a, p in self.items() if a not in settings.DEFAULT_ALIASES})
+        return Aliases(
+            {a: p for a, p in self.items() if a not in settings.DEFAULT_ALIASES or p != settings.DEFAULT_ALIASES[a]})
 
     def default(self):
 
@@ -208,7 +209,8 @@ class Aliases(dict):
             Default aliases
         """
 
-        return Aliases({a: p for a, p in self.items() if a in settings.DEFAULT_ALIASES})
+        return Aliases(
+            {a: p for a, p in self.items() if a in settings.DEFAULT_ALIASES and p == settings.DEFAULT_ALIASES[a]})
 
 
 def count(items_to_count):

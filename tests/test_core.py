@@ -120,20 +120,29 @@ class TestAliases(unittest.TestCase):
     def test_user_defined(self):
 
         # Get all user-defined aliases
-        ud = {'__h__': os.path.expanduser('~')}
-        aliases = core.Aliases(list(ud.items()) + list(settings.DEFAULT_ALIASES.items()))
+        ud = {'desk': os.path.expanduser('~'), '__h__': os.path.expanduser('~')}
+
+        # Be sure to add the user defined LAST so they overwrite any default aliases otherwise test will fail
+        aliases = core.Aliases(list(settings.DEFAULT_ALIASES.items()) + list(ud.items()))
+
         user_defined = aliases.user_defined()
-        self.assertEqual(1, len(user_defined))
+
+        self.assertEqual(len(ud), len(user_defined))
         self.assertDictEqual(ud, user_defined)
 
     def test_default(self):
 
         # Get all default aliases
-        ud = {'__h__': os.path.expanduser('~')}
-        aliases = core.Aliases(list(ud.items()) + list(settings.DEFAULT_ALIASES.items()))
-        default = aliases.default()
-        self.assertEqual(len(list(settings.DEFAULT_ALIASES.items())), len(default))
-        self.assertDictEqual(default, settings.DEFAULT_ALIASES)
+        ud = {'desk': os.path.expanduser('~'), '__h__': os.path.expanduser('~')}
+
+        # Be sure to add the user defined LAST so they overwrite any default aliases otherwise test will fail
+        aliases = core.Aliases(list(settings.DEFAULT_ALIASES.items()) + list(ud.items()))
+
+        expected = {a: p for a, p in settings.DEFAULT_ALIASES.copy().items() if a not in ud}
+        actual = aliases.default()
+
+        self.assertEqual(len(expected.items()), len(actual))
+        self.assertDictEqual(expected, actual)
 
 
 class TestCount(unittest.TestCase):
