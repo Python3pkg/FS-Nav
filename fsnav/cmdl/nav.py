@@ -264,11 +264,11 @@ def addalias(ctx, alias_path, no_overwrite):
         sys.exit(1)
 
     try:
-        aliases = ctx.obj['loaded_aliases'].copy()
+        aliases_ = ctx.obj['loaded_aliases'].copy()
         for a, p in options.parse_key_vals(alias_path).items():
-            aliases[a] = p
+            aliases_[a] = p
         with open(ctx.obj['cfg_path'], 'w') as f:
-            json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases.user_defined()}, f)
+            json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
         sys.exit(0)
     except Exception as e:
         click.echo(e, err=True)
@@ -292,4 +292,38 @@ def path(ctx):
         sys.exit(0)
     except Exception as e:
         click.echo(e, err=True)
+        sys.exit(1)
+
+
+# --------------------------------------------------------------------------- #
+#   Command: delete
+# --------------------------------------------------------------------------- #
+
+@config.command()
+@click.argument(
+    'alias', required=True, nargs=-1
+)
+@click.option(
+    '-no', '--no-overwrite', is_flag=True,
+    help="Don't overwrite configfile if it exists"
+)
+@click.pass_context
+def deletealias(ctx, alias, no_overwrite):
+
+    """
+    Remove an alias from the configfile
+    """
+
+    if no_overwrite and os.access(ctx.obj['cfg_path'], os.W_OK):
+        click.echo("ERROR: No overwrite is {no_overwrite} and configfile exists: {configfile}".format(
+            no_overwrite=no_overwrite, configfile=ctx.obj['cfg_path']), err=True)
+        sys.exit(1)
+
+    try:
+        aliases_ = fsnav.Aliases({a: p for a, p in ctx.obj['loaded_aliases'].items() if a not in alias})
+        with open(ctx.obj['cfg_path'], 'w') as f:
+            json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
+        sys.exit(0)
+    except Exception as e:
+        click.echo(e.message, err=True)
         sys.exit(1)

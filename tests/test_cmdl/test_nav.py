@@ -107,3 +107,14 @@ class TestNav(unittest.TestCase):
         # nav aliases
         result = subprocess.check_output('nav -nlc aliases -np', shell=True)
         self.assertEqual(json.loads(result.decode().strip()), fsnav.settings.DEFAULT_ALIASES)
+
+    def test_deletealias(self):
+
+        # nav config deletealias ${alias}
+        self.configfile.write(
+            json.dumps({fsnav.settings.CONFIGFILE_ALIAS_SECTION: {'__h__': os.path.expanduser('~/')}}))
+        self.configfile.seek(0)
+        result = subprocess.check_output('nav -c {configfile} config deletealias __h__'.format(
+            configfile=self.configfile.name), shell=True)
+        self.assertDictEqual(
+            {fsnav.settings.CONFIGFILE_ALIAS_SECTION: {}}, json.loads(self.configfile.read()))
