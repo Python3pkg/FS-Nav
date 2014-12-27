@@ -11,32 +11,31 @@ import setuptools
 
 
 with open('README.md') as f:
-    readme = f.read()
+    readme = f.read().strip()
 
 
 with open('LICENSE.txt') as f:
-    license = f.read()
+    license = f.read().strip()
 
 
 with open('requirements.txt') as f:
-    install_requires = f.read()
+    install_requires = f.read().strip()
 
 
 version = None
 author = None
 email = None
 source = None
-with open(os.path.join('fsnav', '__init__.py')) as f:
+with open(os.path.join('fsnav', 'settings.py')) as f:
     for line in f:
-        if '__version__' in line:
+        if line.strip().startswith('__version__'):
             version = line.split('=')[1].strip().replace('"', '').replace("'", '')
-        elif '__author__' in line:
+        elif line.strip().startswith('__author__'):
             author = line.split('=')[1].strip().replace('"', '').replace("'", '')
-        elif '__email__' in line:
+        elif line.strip().startswith('__email__'):
             email = line.split('=')[1].strip().replace('"', '').replace("'", '')
-        elif '__source__' in line:
+        elif line.strip().startswith('__source__'):
             source = line.split('=')[1].strip().replace('"', '').replace("'", '')
-
 
 setuptools.setup(
     name='fsnav',
