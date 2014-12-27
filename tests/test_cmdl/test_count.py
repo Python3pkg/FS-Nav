@@ -8,6 +8,7 @@ import unittest
 
 from click.testing import CliRunner
 
+import fsnav
 from fsnav import cmdl
 
 
@@ -54,3 +55,15 @@ class TestCount(unittest.TestCase):
         result = self.runner.invoke(cmdl.count.main, ['*'])
         self.assertEqual(0, result.exit_code)
         self.assertEqual(str(len(self.paths)), result.output.strip())
+
+    def test_license(self):
+
+        # count --license
+        result = self.runner.invoke(cmdl.count.main, ['--license'])
+        self.assertEqual(result.output.strip(), fsnav.__license__.strip())
+
+    def test_version(self):
+
+        # count --version
+        result = self.runner.invoke(cmdl.count.main, ['--version'])
+        self.assertEqual(result.output.strip(), fsnav.__version__.strip())
