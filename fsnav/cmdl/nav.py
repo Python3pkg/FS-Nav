@@ -87,7 +87,33 @@ def get(ctx, alias):
         click.echo(ctx.obj['loaded_aliases'][alias])
         sys.exit(0)
     except KeyError:
-        click.echo("ERROR: Invalid alias: %s" % alias)
+        click.echo("ERROR: Invalid alias: %s" % alias, err=True)
+        sys.exit(1)
+
+
+# --------------------------------------------------------------------------- #
+#   Command: aliases
+# --------------------------------------------------------------------------- #
+
+@main.command()
+@options.no_pretty
+@click.pass_context
+def aliases(ctx, no_pretty):
+
+    """
+    Print recognized aliases
+    """
+
+    try:
+        aliases_ = {str(a): str(p) for a, p in ctx.obj['loaded_aliases'].as_dict().items()}
+        if no_pretty:
+            text = json.dumps(aliases_)
+        else:
+            text = pprint.pformat(aliases_)
+        click.echo(text)
+        sys.exit(0)
+    except Exception as e:
+        click.echo(e, err=True)
         sys.exit(1)
 
 
@@ -233,7 +259,8 @@ def addalias(ctx, alias_path, no_overwrite):
     """
 
     if no_overwrite and os.access(ctx.obj['cfg_path'], os.W_OK):
-        click.echo("ERROR: No overwrite is %s and configfile exists: %s" % (no_overwrite, ctx.obj['cfg_path']))
+        click.echo("ERROR: No overwrite is {no_overwrite} and configfile exists: {configfile}".format(
+            no_overwrite=no_overwrite, configfile=ctx.obj['cfg_path']), err=True)
         sys.exit(1)
 
     try:
@@ -244,7 +271,7 @@ def addalias(ctx, alias_path, no_overwrite):
             json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases.user_defined()}, f)
         sys.exit(0)
     except Exception as e:
-        click.echo(e)
+        click.echo(e, err=True)
         sys.exit(1)
 
 

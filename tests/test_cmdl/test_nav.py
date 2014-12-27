@@ -78,7 +78,8 @@ class TestNav(unittest.TestCase):
         try:
             result = subprocess.check_output(
                 'nav -c {configfile} config addalias -no {alias1}={path1} {alias2}={path2}'.format(
-                    configfile=self.configfile.name, alias1=a1, path1=p1, alias2=a2, path2=p2), shell=True)
+                    configfile=self.configfile.name, alias1=a1, path1=p1, alias2=a2, path2=p2),
+                shell=True, stderr=subprocess.PIPE)
             self.fail("Above command should have returned a non-zero exit code and raised an exception")
         except subprocess.CalledProcessError:
             pass
@@ -100,3 +101,9 @@ class TestNav(unittest.TestCase):
         # nav --version
         result = subprocess.check_output('nav --version', shell=True)
         self.assertEqual(result.decode().strip(), fsnav.__version__.strip())
+
+    def test_aliases(self):
+
+        # nav aliases
+        result = subprocess.check_output('nav -nlc aliases -np', shell=True)
+        self.assertEqual(json.loads(result.decode().strip()), fsnav.settings.DEFAULT_ALIASES)
