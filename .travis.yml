@@ -13,7 +13,3 @@ install:
 
 script:
   - nosetests
-  - coverage run --source=fsnav -m nose
-
-after_success:
-  - coveralls
