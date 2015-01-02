@@ -29,3 +29,14 @@ class TestDefaultAliases(unittest.TestCase):
         for alias, path in settings.DEFAULT_ALIASES.items():
             self.assertIsNotNone(re.match(settings.ALIAS_REGEX, alias), msg="Alias='{}'".format(alias))
             self.assertTrue(os.path.isdir(path) and os.access(path, os.X_OK), msg="Path='{}'".format(path))
+
+    def test_check_for_invalid(self):
+
+        # The number of aliases explicitly defined in the `settings._${PLATFORM}_ALIASES` dictionary
+        # should generally match what ends up in `settings.DEFAULT_ALIASES`.  If the user has modified
+        # The default directory names on their system this test will fail
+
+        self.assertDictEqual(
+            settings.DEFAULT_ALIASES,
+            eval('settings._{norm_plat}_ALIASES.copy()'.format(norm_plat=settings.NORMALIZED_PLATFORM.upper()))
+        )
