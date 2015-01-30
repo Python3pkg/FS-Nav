@@ -198,3 +198,4 @@ The `count` utility directly calls this function.
     import fsnav
     
     num_files = fsnav.count('/Users/geowurster/github/FS-Nav/*')
+
