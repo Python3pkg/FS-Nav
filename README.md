@@ -1,7 +1,7 @@
 FS Nav
 ======
 
-[![Build Status](https://travis-ci.org/geowurster/FS-Nav.svg?branch=master)](https://travis-ci.org/geowurster/FS-Nav) [![Coverage Status](https://coveralls.io/repos/geowurster/FS-Nav/badge.svg?branch=master)](https://coveralls.io/r/geowurster/FS-Nav)
+[![Build Status](https://travis-ci.org/geowurster/FS-Nav.svg?branch=master)](https://travis-ci.org/geowurster/FS-Nav) [![Coverage Status](https://coveralls.io/repos/geowurster/FS-Nav/badge.svg?branch=master)](https://coveralls.io/r/geowurster/FS-Nav?branch=master)
 
 File System Navigation shortcuts for the commandline
 
@@ -198,4 +198,3 @@ The `count` utility directly calls this function.
     import fsnav
     
     num_files = fsnav.count('/Users/geowurster/github/FS-Nav/*')
-
