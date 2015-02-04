@@ -36,7 +36,7 @@ class TestDefaultAliases(unittest.TestCase):
         # should generally match what ends up in `settings.DEFAULT_ALIASES`.  If the user has modified
         # The default directory names on their system this test will fail
 
-        self.assertDictEqual(
-            settings.DEFAULT_ALIASES,
-            settings.__dict__['_{norm_plat}_ALIASES'.format(norm_plat=settings.NORMALIZED_PLATFORM.upper())].copy()
+        self.assertDictContainsSubset(
+            settings.__dict__['_{norm_plat}_ALIASES'.format(norm_plat=settings.NORMALIZED_PLATFORM.upper())].copy(),
+            settings.DEFAULT_ALIASES
         )
