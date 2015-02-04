@@ -143,6 +143,11 @@ class TestNav(unittest.TestCase):
         self.assertDictEqual(
             {fsnav.settings.CONFIGFILE_ALIAS_SECTION: {}}, json.loads(self.configfile.read()))
 
+        # If specified, make sure the configfile won't be overwritten
+        result = self.runner.invoke(nav.main, ['-c', self.configfile.name, 'config', 'deletealias', '__h__', '-no'])
+        self.assertEqual(1, result.exit_code)
+        self.assertTrue(result.output.startswith('ERROR'))
+
     def test_get_invalid_alias(self):
         result = self.runner.invoke(nav.main, ['get', 'BAAAAAAAAAD-ALIAS'])
         self.assertNotEqual(0, result.exit_code)
