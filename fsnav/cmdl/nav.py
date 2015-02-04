@@ -105,6 +105,7 @@ def aliases(ctx, no_pretty):
     """
 
     try:
+
         aliases_ = {str(a): str(p) for a, p in ctx.obj['loaded_aliases'].as_dict().items()}
         if no_pretty:
             text = json.dumps(aliases_)
@@ -112,8 +113,9 @@ def aliases(ctx, no_pretty):
             text = pprint.pformat(aliases_)
         click.echo(text)
         sys.exit(0)
-    except Exception as e:
-        click.echo(e, err=True)
+
+    except Exception as e:  # pragma no cover
+        click.echo(str(e), err=True)
         sys.exit(1)
 
 
@@ -145,10 +147,12 @@ def generate(ctx):
     """
 
     try:
+
         click.echo(' ; '.join(fsnav.fg_tools.generate_functions(ctx.obj['loaded_aliases'])))
         sys.exit(0)
-    except Exception as e:
-        click.echo(e, err=True)
+
+    except Exception as e:  # pragma no cover
+        click.echo(str(e), err=True)
         sys.exit(1)
 
 
@@ -165,10 +169,12 @@ def profile(ctx):
     """
 
     try:
+
         click.echo(fsnav.fg_tools.startup_code)
         sys.exit(0)
-    except Exception as e:
-        click.echo(e, err=True)
+
+    except Exception as e:  # pragma no cover
+        click.echo(str(e), err=True)
         sys.exit(1)
 
 
@@ -201,6 +207,7 @@ def default(ctx, no_pretty):
     """
 
     try:
+
         default_aliases = {str(a): str(p) for a, p in ctx.obj['loaded_aliases'].default().as_dict().items()}
         if no_pretty:
             text = json.dumps(default_aliases)
@@ -208,8 +215,9 @@ def default(ctx, no_pretty):
             text = pprint.pformat(default_aliases)
         click.echo(text)
         sys.exit(0)
+
     except Exception as e:
-        click.echo(e, err=True)
+        click.echo(str(e), err=True)
         sys.exit(1)
 
 
@@ -227,6 +235,7 @@ def userdefined(ctx, no_pretty):
     """
 
     try:
+
         nd_aliases = {str(a): str(p) for a, p in ctx.obj['loaded_aliases'].user_defined().as_dict().items()}
         if no_pretty:
             text = json.dumps(nd_aliases)
@@ -234,8 +243,9 @@ def userdefined(ctx, no_pretty):
             text = pprint.pformat(nd_aliases)
         click.echo(text)
         sys.exit(0)
+
     except Exception as e:
-        click.echo(e, err=True)
+        click.echo(str(e), err=True)
         sys.exit(1)
 
 
@@ -271,7 +281,7 @@ def addalias(ctx, alias_path, no_overwrite):
             json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
         sys.exit(0)
     except Exception as e:
-        click.echo(e, err=True)
+        click.echo(str(e), err=True)
         sys.exit(1)
 
 
@@ -291,7 +301,7 @@ def path(ctx):
         click.echo(ctx.obj['cfg_path'])
         sys.exit(0)
     except Exception as e:
-        click.echo(e, err=True)
+        click.echo(str(e), err=True)
         sys.exit(1)
 
 
@@ -320,10 +330,12 @@ def deletealias(ctx, alias, no_overwrite):
         sys.exit(1)
 
     try:
+
         aliases_ = fsnav.Aliases({a: p for a, p in ctx.obj['loaded_aliases'].items() if a not in alias})
         with open(ctx.obj['cfg_path'], 'w') as f:
             json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
         sys.exit(0)
-    except Exception as e:
-        click.echo(e.message, err=True)
+
+    except Exception as e:  # pragma no cover
+        click.echo(str(e).message, err=True)
         sys.exit(1)

@@ -86,6 +86,6 @@ def _generate_windows_startup_code():
 if settings.NORMALIZED_PLATFORM in ('mac', 'cygwin', 'linux', 'win', 'UNKNOWN'):
     generate_functions = _generate_nix_functions
     startup_code = _generate_nix_startup_code()
-elif settings.NORMALIZED_PLATFORM == 'windows':
+elif settings.NORMALIZED_PLATFORM == 'windows':  # pragma no cover
     generate_functions = _generate_windows_functions
     startup_code = _generate_windows_startup_code()

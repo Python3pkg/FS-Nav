@@ -58,13 +58,21 @@ class TestNav(unittest.TestCase):
     def test_config_userdefined(self):
 
         # nav config userdefined
-        expected = {'__h__': os.path.expanduser('~')}
-        aliases_to_load = dict(list(expected.items()) + list(fsnav.settings.DEFAULT_ALIASES.items()))
-        self.configfile.write(json.dumps({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_to_load}))
-        self.configfile.seek(0)
-        result = self.runner.invoke(nav.main, ['-c', self.configfile.name, 'config', 'userdefined', '-np'])
-        self.assertEqual(result.exit_code, 0)
-        self.assertDictEqual(expected, json.loads(result.output.strip()))
+        for pprint_option in ('', '-np'):
+
+            expected = {'__h__': os.path.expanduser('~')}
+            aliases_to_load = dict(list(expected.items()) + list(fsnav.settings.DEFAULT_ALIASES.items()))
+
+            self.configfile.write(json.dumps({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_to_load}))
+
+            self.configfile.seek(0)
+            args = ['-c', self.configfile.name, 'config', 'userdefined']
+            if pprint_option != '':
+                args.append(pprint_option)
+            result = self.runner.invoke(nav.main, args)
+
+            self.assertEqual(result.exit_code, 0)
+            self.assertDictEqual(expected, json.loads(result.output.replace("'", '"').strip()))
 
     def test_config_addalias(self):
 
@@ -109,9 +117,13 @@ class TestNav(unittest.TestCase):
     def test_aliases(self):
 
         # nav aliases
-        result = self.runner.invoke(nav.main, ['-nlc', 'aliases', '-np'])
-        self.assertEqual(result.exit_code, 0)
-        self.assertEqual(json.loads(result.output.strip()), fsnav.settings.DEFAULT_ALIASES)
+        for pprint_option in ('', '-np'):
+            args = ['-nlc', 'aliases', '-np']
+            if pprint_option:
+                args.append(pprint_option)
+            result = self.runner.invoke(nav.main, args)
+            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(json.loads(result.output.replace("'", '"').strip()), fsnav.settings.DEFAULT_ALIASES)
 
     def test_deletealias(self):
 
@@ -123,3 +135,8 @@ class TestNav(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertDictEqual(
             {fsnav.settings.CONFIGFILE_ALIAS_SECTION: {}}, json.loads(self.configfile.read()))
+
+    def test_get_invalid_alias(self):
+        result = self.runner.invoke(nav.main, ['get', 'BAAAAAAAAAD-ALIAS'])
+        self.assertNotEqual(0, result.exit_code)
+        self.assertTrue(result.output.startswith('ERROR'))

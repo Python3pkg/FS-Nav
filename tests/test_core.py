@@ -144,6 +144,16 @@ class TestAliases(unittest.TestCase):
         self.assertEqual(len(expected.items()), len(actual))
         self.assertDictEqual(expected, actual)
 
+    def test_repr(self):
+        aliases = core.Aliases()
+        self.assertIsInstance(repr(aliases), str)
+        self.assertTrue(repr(aliases).startswith(aliases.__class__.__name__))
+
+    def test_with_statement(self):
+        with core.Aliases({'home': self.homedir, 'desk': self.deskdir}) as aliases:
+            self.assertEqual(aliases['home'], self.homedir)
+            self.assertEqual(aliases['desk'], self.deskdir)
+
 
 class TestCount(unittest.TestCase):
 

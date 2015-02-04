@@ -27,8 +27,10 @@ def main(ctx, paths):
     """
 
     try:
+
         click.echo(fsnav.count(paths))
         sys.exit(0)
-    except Exception as e:
-        click.echo(e.message, err=True)
+
+    except Exception as e:  # pragma no cover
+        click.echo(str(e), err=True)
         sys.exit(1)

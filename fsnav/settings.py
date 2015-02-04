@@ -66,15 +66,15 @@ NAV_UTIL = 'nav'
 #   Platform information
 # =========================================================================== #
 
-if 'darwin' in sys.platform.lower().strip():
+if 'darwin' in sys.platform.lower().strip():  # pragma no cover
     NORMALIZED_PLATFORM = 'mac'
-elif 'cygwin' in sys.platform.lower().strip():
+elif 'cygwin' in sys.platform.lower().strip():  # pragma no cover
     NORMALIZED_PLATFORM = 'cygwin'
-elif 'linux' in sys.platform.lower().strip():
+elif 'linux' in sys.platform.lower().strip():  # pragma no cover
     NORMALIZED_PLATFORM = 'linux'
-elif 'win' in sys.platform.lower().strip():
+elif 'win' in sys.platform.lower().strip():  # pragma no cover
     NORMALIZED_PLATFORM = 'windows'
-else:
+else:  # pragma no cover
     NORMALIZED_PLATFORM = 'UNKNOWN'
 
 
@@ -227,30 +227,15 @@ _UNKNOWN_ALIASES = {
 #   Expose aliases
 # =========================================================================== #
 
-def _remove_invalid_paths(alias_dict):
-
-    """
-    Filter out invalid aliases.
-
-    This could call core.validate_alias() and core.validate_path() but that
-    would cause a circular import so the logic is re-created.
-
-    Returns
-    -------
-    dict
-    """
-
-    return
-
-if NORMALIZED_PLATFORM == 'mac':
+if NORMALIZED_PLATFORM == 'mac':  # pragma no cover
     _DEFAULT_ALIASES = _MAC_ALIASES.copy()
-elif NORMALIZED_PLATFORM == 'linux':
+elif NORMALIZED_PLATFORM == 'linux':  # pragma no cover
     _DEFAULT_ALIASES = _LINUX_ALIASES.copy()
-elif NORMALIZED_PLATFORM == 'cygwin':
+elif NORMALIZED_PLATFORM == 'cygwin':  # pragma no cover
     _DEFAULT_ALIASES = _CYGWIN_ALIASES.copy()
-elif NORMALIZED_PLATFORM == 'win':
+elif NORMALIZED_PLATFORM == 'win':  # pragma no cover
     _DEFAULT_ALIASES = _WINDOWS_ALIASES.copy()
-else:
+else:  # pragma no cover
     _DEFAULT_ALIASES = _UNKNOWN_ALIASES.copy()
 
 # Remove aliases pointing towards non-existent directories
