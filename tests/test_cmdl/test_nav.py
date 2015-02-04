@@ -51,9 +51,14 @@ class TestNav(unittest.TestCase):
     def test_config_default(self):
 
         # nav config default
-        result = self.runner.invoke(nav.main, ['-nlc', 'config', 'default', '-np'])
-        self.assertEqual(result.exit_code, 0)
-        self.assertDictEqual(json.loads(result.output), self.default_aliases.default())
+        for pprint_option in ('', '-np'):
+            args = ['-nlc', 'config', 'default']
+            if pprint_option:
+                args.append(pprint_option)
+            result = self.runner.invoke(nav.main, args)
+            self.assertEqual(result.exit_code, 0)
+            self.assertDictEqual(json.loads(result.output.replace("'", '"').strip()),
+                                 self.default_aliases.default())
 
     def test_config_userdefined(self):
 
@@ -90,8 +95,10 @@ class TestNav(unittest.TestCase):
 
         # If specified, make sure the configfile won't be overwritten
         result = self.runner.invoke(
-            nav.main, ['-c', self.configfile.name, 'addalias', '-no', '%s=%s' % (a1, p1), '%s=%s' % (a2, p2)])
-        self.assertNotEqual(result.exit_code, 0)
+            nav.main, ['-c', self.configfile.name,
+                       'config', 'addalias', '-no', '%s=%s' % (a1, p1), '%s=%s' % (a2, p2)])
+        self.assertEqual(1, result.exit_code)
+        self.assertTrue(result.output.startswith('ERROR'))
 
     def test_config_path(self):
 
@@ -118,7 +125,7 @@ class TestNav(unittest.TestCase):
 
         # nav aliases
         for pprint_option in ('', '-np'):
-            args = ['-nlc', 'aliases', '-np']
+            args = ['-nlc', 'aliases']
             if pprint_option:
                 args.append(pprint_option)
             result = self.runner.invoke(nav.main, args)

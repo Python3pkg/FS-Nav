@@ -216,7 +216,7 @@ def default(ctx, no_pretty):
         click.echo(text)
         sys.exit(0)
 
-    except Exception as e:
+    except Exception as e:  # pragma no cover
         click.echo(str(e), err=True)
         sys.exit(1)
 
@@ -244,7 +244,7 @@ def userdefined(ctx, no_pretty):
         click.echo(text)
         sys.exit(0)
 
-    except Exception as e:
+    except Exception as e:  # pragma no cover
         click.echo(str(e), err=True)
         sys.exit(1)
 
@@ -274,13 +274,15 @@ def addalias(ctx, alias_path, no_overwrite):
         sys.exit(1)
 
     try:
+
         aliases_ = ctx.obj['loaded_aliases'].copy()
         for a, p in options.parse_key_vals(alias_path).items():
             aliases_[a] = p
         with open(ctx.obj['cfg_path'], 'w') as f:
             json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
         sys.exit(0)
-    except Exception as e:
+
+    except Exception as e:  # pragma no cover
         click.echo(str(e), err=True)
         sys.exit(1)
 
@@ -298,9 +300,11 @@ def path(ctx):
     """
 
     try:
+
         click.echo(ctx.obj['cfg_path'])
         sys.exit(0)
-    except Exception as e:
+
+    except Exception as e:  # pragma no cover
         click.echo(str(e), err=True)
         sys.exit(1)
 

@@ -38,5 +38,5 @@ class TestDefaultAliases(unittest.TestCase):
 
         self.assertDictEqual(
             settings.DEFAULT_ALIASES,
-            eval('settings._{norm_plat}_ALIASES.copy()'.format(norm_plat=settings.NORMALIZED_PLATFORM.upper()))
+            settings.__dict__['_{norm_plat}_ALIASES'.format(norm_plat=settings.NORMALIZED_PLATFORM.upper())].copy()
         )
