@@ -36,6 +36,8 @@ with open(os.path.join('fsnav', 'settings.py')) as f:
             email = line.split('=')[1].strip().replace('"', '').replace("'", '')
         elif line.strip().startswith('__source__'):
             source = line.split('=')[1].strip().replace('"', '').replace("'", '')
+        elif None not in (version, author, email, source):
+            break
 
 setuptools.setup(
     name='fsnav',
