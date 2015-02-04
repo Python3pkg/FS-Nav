@@ -37,6 +37,6 @@ class TestDefaultAliases(unittest.TestCase):
         # The default directory names on their system this test will fail
 
         self.assertDictContainsSubset(
+            settings.DEFAULT_ALIASES,
             settings.__dict__['_{norm_plat}_ALIASES'.format(norm_plat=settings.NORMALIZED_PLATFORM.upper())].copy(),
-            settings.DEFAULT_ALIASES
         )
