@@ -179,13 +179,3 @@ class TestDefaultAliases(unittest.TestCase):
                 re.match(core.ALIAS_REGEX, alias), msg="Alias='{}'".format(alias))
             self.assertTrue(
                 os.path.isdir(path) and os.access(path, os.X_OK), msg="Path='{}'".format(path))
-
-    def test_check_for_invalid(self):
-
-        # The number of aliases explicitly defined in the `core._${PLATFORM}_ALIASES`
-        # dictionary should generally match what ends up in `core.DEFAULT_ALIASES`.  If the
-        # user has modified The default directory names on their system this test will fail
-
-        for a in core.__dict__['_{norm_plat}_ALIASES'.format(
-                norm_plat=core.NORMALIZED_PLATFORM.upper())].copy():
-            self.assertTrue(a in core.DEFAULT_ALIASES)
