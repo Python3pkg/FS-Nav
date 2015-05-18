@@ -76,8 +76,9 @@ class TestAliases(unittest.TestCase):
         alias = 'home'
         path = self.homedir
 
-        # These is an important tests because they validates that Aliases.__setitem__() is ALWAYS called
-        # instead of dict.__setitem__(), which the case without using the super() call in Aliases.__setitem__()
+        # These is an important tests because they validates that `Aliases.__setitem__()`
+        # is ALWAYS called instead of `dict.__setitem__()`, which the case without using the
+        # `super()` call in `Aliases.__setitem__()`.
         self.assertRaises(ValueError, aliases.setdefault, alias, '.INVALID----DIR')
         self.assertRaises(KeyError, aliases.setdefault, 'invalid alias', self.homedir)
 
@@ -122,7 +123,8 @@ class TestAliases(unittest.TestCase):
         # Get all user-defined aliases
         ud = {'desk': os.path.expanduser('~'), '__h__': os.path.expanduser('~')}
 
-        # Be sure to add the user defined LAST so they overwrite any default aliases otherwise test will fail
+        # Be sure to add the user defined LAST so they overwrite any default aliases otherwise
+        # test will fail
         aliases = core.Aliases(list(settings.DEFAULT_ALIASES.items()) + list(ud.items()))
 
         user_defined = aliases.user_defined()
@@ -135,7 +137,8 @@ class TestAliases(unittest.TestCase):
         # Get all default aliases
         ud = {'desk': os.path.expanduser('~'), '__h__': os.path.expanduser('~')}
 
-        # Be sure to add the user defined LAST so they overwrite any default aliases otherwise test will fail
+        # Be sure to add the user defined LAST so they overwrite any default aliases otherwise
+        # test will fail
         aliases = core.Aliases(list(settings.DEFAULT_ALIASES.items()) + list(ud.items()))
 
         expected = {a: p for a, p in settings.DEFAULT_ALIASES.copy().items() if a not in ud}

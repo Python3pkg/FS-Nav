@@ -12,7 +12,8 @@ from fsnav import fg_tools
 class TestFunctions(unittest.TestCase):
 
     def test_generate_nix_functions(self):
-        self.assertIsInstance(fg_tools._generate_nix_functions(fsnav.Aliases({'home': '~/'})), list)
+        self.assertIsInstance(
+            fg_tools._generate_nix_functions(fsnav.Aliases({'home': '~/'})), list)
 
     def test_generate_windows_functions(self):
         self.assertRaises(NotImplementedError, fg_tools._generate_windows_functions, None)

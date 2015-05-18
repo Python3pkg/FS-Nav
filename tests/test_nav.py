@@ -8,7 +8,9 @@ import os
 import tempfile
 import unittest
 
+import click
 from click.testing import CliRunner
+from nose.tools import assert_raises
 
 import fsnav
 from fsnav import nav
@@ -128,13 +130,17 @@ class TestNav(unittest.TestCase):
             result = self.runner.invoke(nav.main, args)
 
             self.assertEqual(result.exit_code, 0)
-            self.assertEqual(json.loads(result.output.replace("'", '"').strip()), fsnav.settings.DEFAULT_ALIASES)
+            self.assertEqual(
+                json.loads(result.output.replace("'", '"').strip()),
+                fsnav.settings.DEFAULT_ALIASES
+            )
 
     def test_delete_alias(self):
 
         # nav config deletealias ${alias}
         self.configfile.write(
-            json.dumps({fsnav.settings.CONFIGFILE_ALIAS_SECTION: {'__h__': os.path.expanduser('~/')}}))
+            json.dumps({
+                fsnav.settings.CONFIGFILE_ALIAS_SECTION: {'__h__': os.path.expanduser('~/')}}))
         self.configfile.seek(0)
         result = self.runner.invoke(nav.main, [
             '--configfile', self.configfile.name,
@@ -144,9 +150,20 @@ class TestNav(unittest.TestCase):
             {fsnav.settings.CONFIGFILE_ALIAS_SECTION: {}}, json.loads(self.configfile.read()))
 
         # If specified, make sure the configfile won't be overwritten
-        result = self.runner.invoke(nav.main, ['--configfile', self.configfile.name, 'config', 'deletealias', '__h__', '-no'])
+        result = self.runner.invoke(nav.main, [
+            '--configfile', self.configfile.name,
+            'config', 'deletealias',
+            '__h__', '-no'])
         self.assertEqual(1, result.exit_code)
 
     def test_get_invalid_alias(self):
         result = self.runner.invoke(nav.main, ['get', 'BAAAAAAAAAD-ALIAS'])
         self.assertNotEqual(0, result.exit_code)
+
+
+def test_cb_key_val():
+    expected = {'key1': 'val1', 'key2': 'val2'}
+    args = ('key1=val1', 'key2=val2')
+    assert nav._cb_key_val(None, None, args) == expected
+    with assert_raises(click.BadParameter):
+        nav._cb_key_val(None, None, ('key'))

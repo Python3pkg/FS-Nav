@@ -23,7 +23,8 @@ def _generate_nix_functions(aliases):
           shortcuts to specific directories.
     """
 
-    return ['function %s() { cd "$(%s get %s)" ; }' % (alias, settings.NAV_UTIL, alias) for alias in aliases]
+    return ['function %s() { cd "$(%s get %s)" ; }'
+            % (alias, settings.NAV_UTIL, alias) for alias in aliases]
 
 
 def _generate_windows_functions(aliases):

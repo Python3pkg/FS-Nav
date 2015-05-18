@@ -202,6 +202,7 @@ else:  # pragma no cover
 # Remove aliases pointing towards non-existent directories
 # Python 2.6 does not support direct dictionary comprehension
 _DEFAULT_ALIASES = dict(
-    (a, p) for a, p in _DEFAULT_ALIASES.copy().items() if os.path.isdir(p) and os.access(p, os.X_OK)
+    (a, p) for a, p in _DEFAULT_ALIASES.copy().items()
+    if os.path.isdir(p) and os.access(p, os.X_OK)
 )
 DEFAULT_ALIASES = _DEFAULT_ALIASES.copy()
