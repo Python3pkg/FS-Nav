@@ -64,6 +64,6 @@ setuptools.setup(
     install_requires=install_requires,
     entry_points="""
         [console_scripts]
-        nav=fsnav.cli.nav:main
+        nav=fsnav.nav:main
     """
 )

@@ -153,37 +153,3 @@ class TestAliases(unittest.TestCase):
         with core.Aliases({'home': self.homedir, 'desk': self.deskdir}) as aliases:
             self.assertEqual(aliases['home'], self.homedir)
             self.assertEqual(aliases['desk'], self.deskdir)
-
-
-class TestCount(unittest.TestCase):
-
-    def setUp(self):
-
-        self.homedir = os.path.expanduser('~')
-        self.homedir_contents = glob(os.path.join(self.homedir, '*'))
-
-        # Make sure there's something to test with
-        self.assertGreater(len(self.homedir_contents), 0)
-
-    def test_standard(self):
-
-        # No duplicate items, and no validation.  Just return the number of input items.  Return value should be equal
-        # to the length of the input list
-        self.assertEqual(len(self.homedir_contents), core.count(self.homedir_contents))
-
-    def test_duplicate(self):
-
-        # Count with duplicate items should return a count of all unique items - list() call ensures a new list is
-        # returned instead of a pointer
-        test_items = list(self.homedir_contents)
-        test_items.append(self.homedir_contents[0])
-        test_items.append(self.homedir_contents[1])
-        self.assertEqual(len(self.homedir_contents), core.count(test_items))
-        self.assertRaises(TypeError, core.count, [None])
-
-    def test_non_existent(self):
-
-        # Non-existent items should be ignored and not reflected int he final count
-        test_items = list(self.homedir_contents)
-        test_items.append('.I-_DO-NOT___--EXIST')
-        self.assertEqual(len(self.homedir_contents), core.count(test_items))

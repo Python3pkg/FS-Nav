@@ -3,14 +3,13 @@ Core functions and classes for FS Nav
 """
 
 
-from glob import glob
 import os
 import re
 
 from . import settings
 
 
-__all__ = ['Aliases', 'count']
+__all__ = ['Aliases']
 
 
 class Aliases(dict):
@@ -95,9 +94,9 @@ class Aliases(dict):
         Raises
         ------
         ValueError
-            Invalid alias
+            Invalid alias.
         KeyError
-            Invalid path
+            Invalid path.
 
         Returns
         -------
@@ -112,7 +111,9 @@ class Aliases(dict):
 
         # Validate the alias
         if re.match(settings.ALIAS_REGEX, alias) is None:
-            raise KeyError("Aliases can only contain alphanumeric characters and '-' or '_': '%s'" % alias)
+            raise KeyError(
+                "Aliases can only contain alphanumeric characters and '-' or '_': '%s'"
+                % alias)
 
         # Validate the path
         elif not os.path.isdir(path) and not os.access(path, os.X_OK):
@@ -120,8 +121,9 @@ class Aliases(dict):
 
         # Alias and path passed validate - add
         else:
-            # Forces all non-overridden methods that normally call dict.__setitem__ to call Aliases.__setitem__() in
-            # order to take advantage of the alias and path validation
+            # Forces all non-overridden methods that normally call `dict.__setitem__` to call
+            # `Aliases.__setitem__()` in order to take advantage of the alias and path
+            # validation
             super(Aliases, self).__setitem__(alias, path)
 
     def as_dict(self):
@@ -211,26 +213,3 @@ class Aliases(dict):
 
         return Aliases(
             {a: p for a, p in self.items() if a in settings.DEFAULT_ALIASES and p == settings.DEFAULT_ALIASES[a]})
-
-
-def count(items_to_count):
-
-    """
-    Count files and directories on the commandline.  Performs validation
-    and shell expansion so you don't have to.
-
-    Parameters
-    ----------
-    items_to_count : list or tuple
-        List of paths to be counted.  Can contain ``*`` wildcards or ``~/``.
-    """
-
-    # Expand all * wildcards and ~/ references
-    expanded = []
-    for path in items_to_count:
-        if '~' in path:
-            path = os.path.expanduser(path)
-        for p in glob(path):
-            expanded.append(p)
-
-    return len(set([p for p in expanded if os.path.exists(p)]))
