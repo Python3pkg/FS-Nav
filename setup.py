@@ -10,7 +10,7 @@ import os
 import setuptools
 
 
-with open('README.md') as f:
+with open('README.rst') as f:
     readme = f.read().strip()
 
 
@@ -64,7 +64,6 @@ setuptools.setup(
     install_requires=install_requires,
     entry_points="""
         [console_scripts]
-        count=fsnav.cmdl.count:main
-        nav=fsnav.cmdl.nav:main
+        nav=fsnav.cli.nav:main
     """
 )
