@@ -3,7 +3,7 @@ Commandline function generator tools
 """
 
 
-from . import settings
+from . import core
 
 
 def _generate_nix_functions(aliases):
@@ -24,7 +24,7 @@ def _generate_nix_functions(aliases):
     """
 
     return ['function %s() { cd "$(%s get %s)" ; }'
-            % (alias, settings.NAV_UTIL, alias) for alias in aliases]
+            % (alias, core.NAV_UTIL, alias) for alias in aliases]
 
 
 def _generate_windows_functions(aliases):
@@ -65,7 +65,7 @@ def _generate_nix_startup_code():
 if [ -x $(which %s) ]; then
     eval $(%s startup generate)
 fi
-""" % (settings.NAV_UTIL, settings.NAV_UTIL)
+""" % (core.NAV_UTIL, core.NAV_UTIL)
 
 
 def _generate_windows_startup_code():
@@ -84,9 +84,9 @@ def _generate_windows_startup_code():
     raise NotImplementedError("Windows commandline shortcuts are not currently supported")
 
 
-if settings.NORMALIZED_PLATFORM in ('mac', 'cygwin', 'linux', 'win', 'UNKNOWN'):
+if core.NORMALIZED_PLATFORM in ('mac', 'cygwin', 'linux', 'win', 'UNKNOWN'):
     generate_functions = _generate_nix_functions
     startup_code = _generate_nix_startup_code()
-elif settings.NORMALIZED_PLATFORM == 'windows':  # pragma no cover
+elif core.NORMALIZED_PLATFORM == 'windows':  # pragma no cover
     generate_functions = _generate_windows_functions
     startup_code = _generate_windows_startup_code()

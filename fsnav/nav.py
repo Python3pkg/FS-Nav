@@ -10,6 +10,7 @@ import pprint
 import click
 
 import fsnav
+import fsnav.core
 import fsnav.fg_tools
 
 
@@ -49,7 +50,7 @@ def _cb_key_val(ctx, param, value):
     '--no-pretty', is_flag=True, help="Don't format output"
 )
 @click.option(
-    '--configfile', type=click.Path(), default=fsnav.settings.CONFIGFILE,
+    '--configfile', type=click.Path(), default=fsnav.core.CONFIGFILE,
     help="Specify configfile"
 )
 @click.option(
@@ -87,11 +88,11 @@ def main(ctx, configfile, no_load_default, no_load_configfile, no_pretty):
 
     # Load the default and configfile aliases according to the above settings
     if not no_load_default:
-        for a, p in fsnav.settings.DEFAULT_ALIASES.items():
+        for a, p in fsnav.core.DEFAULT_ALIASES.items():
             ctx.obj['loaded_aliases'][a] = p
     if ctx.obj['cfg_content'] is not None and not \
             no_load_configfile and os.access(configfile, os.R_OK):
-        for a, p in ctx.obj['cfg_content'][fsnav.settings.CONFIGFILE_ALIAS_SECTION].items():
+        for a, p in ctx.obj['cfg_content'][fsnav.core.CONFIGFILE_ALIAS_SECTION].items():
             ctx.obj['loaded_aliases'][a] = p
 
 
@@ -222,7 +223,7 @@ def addalias(ctx, alias_path, no_overwrite):
     aliases_ = ctx.obj['loaded_aliases'].copy()
     aliases_.update(**alias_path)
     with open(ctx.obj['cfg_path'], 'w') as f:
-        json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
+        json.dump({fsnav.core.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
 
 
 @config.command()
@@ -259,4 +260,4 @@ def deletealias(ctx, alias, no_overwrite):
     aliases_ = fsnav.Aliases(
         {a: p for a, p in ctx.obj['loaded_aliases'].items() if a not in alias})
     with open(ctx.obj['cfg_path'], 'w') as f:
-        json.dump({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)
+        json.dump({fsnav.core.CONFIGFILE_ALIAS_SECTION: aliases_.user_defined()}, f)

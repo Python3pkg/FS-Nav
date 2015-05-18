@@ -13,6 +13,7 @@ from click.testing import CliRunner
 from nose.tools import assert_raises
 
 import fsnav
+import fsnav.core
 from fsnav import nav
 
 
@@ -21,7 +22,7 @@ class TestNav(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()
         self.configfile = tempfile.NamedTemporaryFile(mode='r+')
-        self.default_aliases = fsnav.Aliases(fsnav.settings.DEFAULT_ALIASES)
+        self.default_aliases = fsnav.Aliases(fsnav.core.DEFAULT_ALIASES)
 
     def tearDown(self):
         self.configfile.close()
@@ -69,10 +70,10 @@ class TestNav(unittest.TestCase):
 
             expected = {'__h__': os.path.expanduser('~')}
             aliases_to_load = dict(
-                list(expected.items()) + list(fsnav.settings.DEFAULT_ALIASES.items()))
+                list(expected.items()) + list(fsnav.core.DEFAULT_ALIASES.items()))
 
             self.configfile.write(
-                json.dumps({fsnav.settings.CONFIGFILE_ALIAS_SECTION: aliases_to_load}))
+                json.dumps({fsnav.core.CONFIGFILE_ALIAS_SECTION: aliases_to_load}))
 
             self.configfile.seek(0)
             args = ['--configfile', self.configfile.name, 'config', 'userdefined']
@@ -95,7 +96,7 @@ class TestNav(unittest.TestCase):
             'config', 'addalias', '%s=%s' % (a1, p1), '%s=%s' % (a2, p2)])
 
         self.assertEqual(result.exit_code, 0)
-        actual = json.load(self.configfile)[fsnav.settings.CONFIGFILE_ALIAS_SECTION]
+        actual = json.load(self.configfile)[fsnav.core.CONFIGFILE_ALIAS_SECTION]
         expected = {a1: p2, a2: p2}
         self.assertDictEqual(expected, actual)
 
@@ -111,7 +112,7 @@ class TestNav(unittest.TestCase):
         # nav config path
         result = self.runner.invoke(nav.main, ['config', 'path'])
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual(result.output.strip(), fsnav.settings.CONFIGFILE)
+        self.assertEqual(result.output.strip(), fsnav.core.CONFIGFILE)
 
     def test_version(self):
 
@@ -132,7 +133,7 @@ class TestNav(unittest.TestCase):
             self.assertEqual(result.exit_code, 0)
             self.assertEqual(
                 json.loads(result.output.replace("'", '"').strip()),
-                fsnav.settings.DEFAULT_ALIASES
+                fsnav.core.DEFAULT_ALIASES
             )
 
     def test_delete_alias(self):
@@ -140,14 +141,14 @@ class TestNav(unittest.TestCase):
         # nav config deletealias ${alias}
         self.configfile.write(
             json.dumps({
-                fsnav.settings.CONFIGFILE_ALIAS_SECTION: {'__h__': os.path.expanduser('~/')}}))
+                fsnav.core.CONFIGFILE_ALIAS_SECTION: {'__h__': os.path.expanduser('~/')}}))
         self.configfile.seek(0)
         result = self.runner.invoke(nav.main, [
             '--configfile', self.configfile.name,
             'config', 'deletealias', '__h__'])
         self.assertEqual(result.exit_code, 0)
         self.assertDictEqual(
-            {fsnav.settings.CONFIGFILE_ALIAS_SECTION: {}}, json.loads(self.configfile.read()))
+            {fsnav.core.CONFIGFILE_ALIAS_SECTION: {}}, json.loads(self.configfile.read()))
 
         # If specified, make sure the configfile won't be overwritten
         result = self.runner.invoke(nav.main, [

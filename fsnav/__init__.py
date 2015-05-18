@@ -3,8 +3,7 @@ FS Nav - File System Navigation shortcuts for the commandline
 """
 
 
-from .core import Aliases
-from . import settings
+from .core import Aliases, CONFIGFILE, DEFAULT_ALIASES
 
 
 __version__ = '0.9.2'

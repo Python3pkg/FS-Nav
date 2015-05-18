@@ -26,7 +26,7 @@ version = None
 author = None
 email = None
 source = None
-with open(os.path.join('fsnav', 'settings.py')) as f:
+with open(os.path.join('fsnav', '__init__.py')) as f:
     for line in f:
         if line.strip().startswith('__version__'):
             version = line.split('=')[1].strip().replace('"', '').replace("'", '')

@@ -3,12 +3,11 @@ Unittests for: fsnav.core
 """
 
 
-from glob import glob
 import os
+import re
 import unittest
 
 from fsnav import core
-from fsnav import settings
 
 
 class TestAliases(unittest.TestCase):
@@ -125,7 +124,7 @@ class TestAliases(unittest.TestCase):
 
         # Be sure to add the user defined LAST so they overwrite any default aliases otherwise
         # test will fail
-        aliases = core.Aliases(list(settings.DEFAULT_ALIASES.items()) + list(ud.items()))
+        aliases = core.Aliases(list(core.DEFAULT_ALIASES.items()) + list(ud.items()))
 
         user_defined = aliases.user_defined()
 
@@ -139,9 +138,9 @@ class TestAliases(unittest.TestCase):
 
         # Be sure to add the user defined LAST so they overwrite any default aliases otherwise
         # test will fail
-        aliases = core.Aliases(list(settings.DEFAULT_ALIASES.items()) + list(ud.items()))
+        aliases = core.Aliases(list(core.DEFAULT_ALIASES.items()) + list(ud.items()))
 
-        expected = {a: p for a, p in settings.DEFAULT_ALIASES.copy().items() if a not in ud}
+        expected = {a: p for a, p in core.DEFAULT_ALIASES.copy().items() if a not in ud}
         actual = aliases.default()
 
         self.assertEqual(len(expected.items()), len(actual))
@@ -156,3 +155,37 @@ class TestAliases(unittest.TestCase):
         with core.Aliases({'home': self.homedir, 'desk': self.deskdir}) as aliases:
             self.assertEqual(aliases['home'], self.homedir)
             self.assertEqual(aliases['desk'], self.deskdir)
+
+
+class TestDefaultAliases(unittest.TestCase):
+
+    def setUp(self):
+
+        # Make sure there's something to test
+        self.assertGreater(len(core.DEFAULT_ALIASES), 0)
+
+    def test_existence(self):
+
+        # Make sure all the default aliases actually exist and are accessible
+        for path in core.DEFAULT_ALIASES.values():
+            self.assertTrue(os.path.exists(path))
+
+    def test_validity(self):
+
+        # Failure could mean `fsnav.core.validate_path()` and/or `fsnav.core.validate_alias()`
+        # is broken
+        for alias, path in core.DEFAULT_ALIASES.items():
+            self.assertIsNotNone(
+                re.match(core.ALIAS_REGEX, alias), msg="Alias='{}'".format(alias))
+            self.assertTrue(
+                os.path.isdir(path) and os.access(path, os.X_OK), msg="Path='{}'".format(path))
+
+    def test_check_for_invalid(self):
+
+        # The number of aliases explicitly defined in the `core._${PLATFORM}_ALIASES`
+        # dictionary should generally match what ends up in `core.DEFAULT_ALIASES`.  If the
+        # user has modified The default directory names on their system this test will fail
+
+        for a in core.__dict__['_{norm_plat}_ALIASES'.format(
+                norm_plat=core.NORMALIZED_PLATFORM.upper())].copy():
+            self.assertTrue(a in core.DEFAULT_ALIASES)
