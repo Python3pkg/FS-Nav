@@ -140,10 +140,10 @@ class TestAliases(unittest.TestCase):
         # test will fail
         aliases = core.Aliases(list(core.DEFAULT_ALIASES.items()) + list(ud.items()))
 
-        expected = {a: p for a, p in core.DEFAULT_ALIASES.copy().items() if a not in ud}
+        expected = {a: p for a, p in list(core.DEFAULT_ALIASES.copy().items()) if a not in ud}
         actual = aliases.default()
 
-        self.assertEqual(len(expected.items()), len(actual))
+        self.assertEqual(len(list(expected.items())), len(actual))
         self.assertDictEqual(expected, actual)
 
     def test_repr(self):
@@ -167,14 +167,14 @@ class TestDefaultAliases(unittest.TestCase):
     def test_existence(self):
 
         # Make sure all the default aliases actually exist and are accessible
-        for path in core.DEFAULT_ALIASES.values():
+        for path in list(core.DEFAULT_ALIASES.values()):
             self.assertTrue(os.path.exists(path))
 
     def test_validity(self):
 
         # Failure could mean `fsnav.core.validate_path()` and/or `fsnav.core.validate_alias()`
         # is broken
-        for alias, path in core.DEFAULT_ALIASES.items():
+        for alias, path in list(core.DEFAULT_ALIASES.items()):
             self.assertIsNotNone(
                 re.match(core.ALIAS_REGEX, alias), msg="Alias='{}'".format(alias))
             self.assertTrue(

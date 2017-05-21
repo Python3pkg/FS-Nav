@@ -64,7 +64,7 @@ class Aliases(dict):
 
     def __repr__(self):
 
-        return "%s(%s)" % (self.__class__.__name__, dict((a, p) for a, p in self.items()))
+        return "%s(%s)" % (self.__class__.__name__, dict((a, p) for a, p in list(self.items())))
 
     __str__ = __repr__
 
@@ -173,7 +173,7 @@ class Aliases(dict):
         elif alias_iterable and not hasattr(alias_iterable, 'keys'):
             for (alias, path) in alias_iterable:
                 self[alias] = path
-        for alias, path in alias_path.items():
+        for alias, path in list(alias_path.items()):
             self[alias] = path
 
     def copy(self):
@@ -199,7 +199,7 @@ class Aliases(dict):
             All user-defined aes
         """
 
-        return Aliases({a: p for a, p in self.items() if a not in DEFAULT_ALIASES or
+        return Aliases({a: p for a, p in list(self.items()) if a not in DEFAULT_ALIASES or
                         p != DEFAULT_ALIASES[a]})
 
     def default(self):
@@ -213,7 +213,7 @@ class Aliases(dict):
             Default aliases
         """
 
-        return Aliases({a: p for a, p in self.items() if a in DEFAULT_ALIASES and
+        return Aliases({a: p for a, p in list(self.items()) if a in DEFAULT_ALIASES and
                         p == DEFAULT_ALIASES[a]})
 
 
@@ -385,7 +385,7 @@ else:  # pragma no cover
 # Remove aliases pointing towards non-existent directories
 # Python 2.6 does not support direct dictionary comprehension
 _DEFAULT_ALIASES = dict(
-    (a, p) for a, p in _DEFAULT_ALIASES.copy().items()
+    (a, p) for a, p in list(_DEFAULT_ALIASES.copy().items())
     if os.path.isdir(p) and os.access(p, os.X_OK)
 )
 DEFAULT_ALIASES = _DEFAULT_ALIASES.copy()
